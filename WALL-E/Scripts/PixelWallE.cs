@@ -2,7 +2,7 @@ namespace PixelWallEInterpreter;
 public class PixelWallE
 {
     public static bool HadError{get; private set;} = false;
-    public static void Main(String[] args)
+    public static void Main(string[] args)
     {  
         if (args.Length > 1) 
         {
@@ -18,6 +18,7 @@ public class PixelWallE
     {
         string code = File.ReadAllText(path);
         Run(code);
+        if(HadError) Environment.Exit(65);
     }
     // Interactive Mode
     private static void RunPrompt()
@@ -29,9 +30,10 @@ public class PixelWallE
             string? line = Console.ReadLine();
             if(line == null) break;
             Run(line);
+            HadError = false;
         }
     }
-    private static void Run(String source) 
+    private static void Run(string source) 
     {
         Scanner scanner = new Scanner(source);
         List<Token> tokens = scanner.ScanTokens();
@@ -41,7 +43,7 @@ public class PixelWallE
             Console.WriteLine(token);
         }
     }
-    private static void Error(int line , string message)
+    public static void Error(int line , string message)
     {
         Report(line , "" , message);
     }
