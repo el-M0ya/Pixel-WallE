@@ -1,0 +1,14 @@
+C:\000mio\Universidad\Programacion\Avalonia Pojects\WALL-E\Scripts\obj\Debug\net9.0\Scripts.GeneratedMSBuildEditorConfig.editorconfig
+C:\000mio\Universidad\Programacion\Avalonia Pojects\WALL-E\Scripts\obj\Debug\net9.0\Scripts.AssemblyInfoInputs.cache
+C:\000mio\Universidad\Programacion\Avalonia Pojects\WALL-E\Scripts\obj\Debug\net9.0\Scripts.AssemblyInfo.cs
+C:\000mio\Universidad\Programacion\Avalonia Pojects\WALL-E\Scripts\obj\Debug\net9.0\Scripts.csproj.CoreCompileInputs.cache
+C:\000mio\Universidad\Programacion\Avalonia Pojects\WALL-E\Scripts\bin\Debug\net9.0\Scripts.exe
+C:\000mio\Universidad\Programacion\Avalonia Pojects\WALL-E\Scripts\bin\Debug\net9.0\Scripts.deps.json
+C:\000mio\Universidad\Programacion\Avalonia Pojects\WALL-E\Scripts\bin\Debug\net9.0\Scripts.runtimeconfig.json
+C:\000mio\Universidad\Programacion\Avalonia Pojects\WALL-E\Scripts\bin\Debug\net9.0\Scripts.dll
+C:\000mio\Universidad\Programacion\Avalonia Pojects\WALL-E\Scripts\bin\Debug\net9.0\Scripts.pdb
+C:\000mio\Universidad\Programacion\Avalonia Pojects\WALL-E\Scripts\obj\Debug\net9.0\Scripts.dll
+C:\000mio\Universidad\Programacion\Avalonia Pojects\WALL-E\Scripts\obj\Debug\net9.0\refint\Scripts.dll
+C:\000mio\Universidad\Programacion\Avalonia Pojects\WALL-E\Scripts\obj\Debug\net9.0\Scripts.pdb
+C:\000mio\Universidad\Programacion\Avalonia Pojects\WALL-E\Scripts\obj\Debug\net9.0\Scripts.genruntimeconfig.cache
+C:\000mio\Universidad\Programacion\Avalonia Pojects\WALL-E\Scripts\obj\Debug\net9.0\ref\Scripts.dll

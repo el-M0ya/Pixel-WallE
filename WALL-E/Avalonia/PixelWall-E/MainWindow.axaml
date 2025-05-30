@@ -1,13 +1,50 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:PixelWall-E"
+        x:Class="PixelWall_E.MainWindow"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-        x:Class="PixelWall_E.MainWindow"
-        Title="PixelWall_E" Width="400" Height="300">
+        mc:Ignorable="d" d:DesignWidth="340" d:DesignHeight="250"
+        Title="PixelWall_E" Width="400" Height="300"
+        Background = "#FF222222">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top">
 
-        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-            <Button Content = "Haz Click" Click="Button_Click"/>
-    <Button x:Name="btnSaludo" Content="Saludar"/>
-    </StackPanel>
+                 <Grid>
+                <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="100" />
+                        <ColumnDefinition Width="5" />
+                        <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Border Background="LightBlue" Grid.Column="0">
+                        <TextBlock Text = "" Margin="10" />
+                
+                </Border>
+
+                <Border Background = "Gray" Grid.Column="1"/>
+
+                <Border Background = "LightGreen" Grid.Column="2">
+                        <TextBlock Text = "area pricipal" Margin="5"/>
+                </Border>
+
+
+
+                </Grid>
+                
+        </StackPanel>
+
+       
+        
 </Window>
+<!-- 
+
+<Button Content="Print" Width="100" Height="35" Margin="8"
+                        Background="Aqua"
+                        Foreground="DarkBlue"
+                        FontSize="16" FontStyle="Oblique"
+                        BorderThickness="3"
+                        BorderBrush="Black"
+                />
+                <Button Content="Import" Width="100" Height="30" Margin="8"/>
+                <Button Content="Export" Width="100" Height="30" Margin="8"/>
+                <Button Content="Clear" Width="100" Height="30" Margin="8"/> -->

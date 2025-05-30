@@ -14,7 +14,7 @@ public enum TokenType {
  AND , OR ,
 
  // Literals.
- IDENTIFIER, STRING, NUMBER, VAR , 
+   IDENTIFIER, STRING, NUMBER, VAR , NULL ,  
  // Keywords.
     SPAWN , COLOR , SIZE , DRAWLINE , DRAWCIRCLE , DRAWRECTANGLE , FILL , 
    GETACTUALX ,  GETACTUALY ,  GETCANVASIZE ,  GETCOLORCOUNT ,  ISBRUSHCOLOR , 
@@ -27,10 +27,10 @@ public enum TokenType {
 
 public class Token
 {
- TokenType type;
- string lexeme;
- object literal;
- int line; 
+ public TokenType type;
+ public string lexeme;
+ public object literal;
+ public int line; 
  public Token(TokenType type, string lexeme, object literal, int line) {
  this.type = type;
  this.lexeme = lexeme;
