@@ -1,11 +1,15 @@
 namespace PixelWallEInterpreter;
 
-class RuntimeError : Exception
+public class RuntimeError : Exception
 {
-    Token token;
-   public RuntimeError(Token token, string message)
+    public Token token;
+
+    public RuntimeError(Token token, string message) : base(message)
     {
-        //super(message);
         this.token = token;
+    }
+    public string getMessage()
+    {
+        return Message;
     }
 }

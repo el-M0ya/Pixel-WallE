@@ -12,3 +12,4 @@ C:\000mio\Universidad\Programacion\Avalonia Pojects\WALL-E\Scripts\obj\Debug\net
 C:\000mio\Universidad\Programacion\Avalonia Pojects\WALL-E\Scripts\obj\Debug\net9.0\Scripts.pdb
 C:\000mio\Universidad\Programacion\Avalonia Pojects\WALL-E\Scripts\obj\Debug\net9.0\Scripts.genruntimeconfig.cache
 C:\000mio\Universidad\Programacion\Avalonia Pojects\WALL-E\Scripts\obj\Debug\net9.0\ref\Scripts.dll
+C:\000mio\Universidad\Programacion\Avalonia Pojects\WALL-E\Scripts\obj\Debug\net9.0\Scripts.sourcelink.json

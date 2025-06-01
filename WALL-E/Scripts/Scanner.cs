@@ -9,7 +9,8 @@ public class Scanner
     private List<Token> tokens = new List<Token>();
     private static Dictionary<string, TokenType>? keywords = new Dictionary<string, TokenType>()
     {
-        {"GoTo", TokenType.GOTO},
+        { "var", TokenType.VAR},
+        { "GoTo", TokenType.GOTO},
         {"Spawn", TokenType.SPAWN},
         {"Color", TokenType.COLOR},
         {"Size", TokenType.SIZE},
@@ -58,6 +59,8 @@ public class Scanner
             case '.': addToken(TokenType.DOT); break;
             case '-': addToken(TokenType.MINUS); break;
             case '+': addToken(TokenType.PLUS); break;
+            case ';': addToken(TokenType.JUMPLINE); break;
+            
 
             case '&':
                 if (Peek() == '&') addToken(TokenType.AND); break;
@@ -101,6 +104,7 @@ public class Scanner
                 // Ignore whitespace.
                 break;
             case '\n':
+                addToken(TokenType.JUMPLINE);
                 line++;
                 break;
 

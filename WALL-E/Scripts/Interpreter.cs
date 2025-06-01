@@ -1,7 +1,8 @@
 namespace PixelWallEInterpreter;
 
-public class Interpreter : IVisitor<object>
+public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
 {
+    private Environment environment = new Environment();
     public object visitBinary(Expr.Binary expr)
     {
         object left = evaluate(expr.left);
@@ -9,9 +10,9 @@ public class Interpreter : IVisitor<object>
         switch (expr.operat.type)
         {
             case TokenType.PLUS:
-                if (left is double && right is double)
+                if (left is int && right is int)
                 {
-                    return (double)left + (double)right;
+                    return (int)left + (int)right;
                 }
                 if (left is string && right is string)
                 {
@@ -21,32 +22,33 @@ public class Interpreter : IVisitor<object>
 
             case TokenType.MINUS:
                 checkNumberOperands(expr.operat, left, right);
-                return (double)left - (double)right;
+                return (int)left - (int)right;
 
             case TokenType.SLASH:
                 checkNumberOperands(expr.operat, left, right);
-                return (double)left / (double)right;
+                if ((int)right == 0) throw new RuntimeError(expr.operat, "Division by 0 is not defined");
+                return (int)left / (int)right;
 
             case TokenType.STAR:
                 checkNumberOperands(expr.operat, left, right);
-                return (double)left * (double)right;
+                return (int)left * (int)right;
 
             case TokenType.GREATER:
                 checkNumberOperands(expr.operat, left, right);
-                return (double)left > (double)right;
+                return (int)left > (int)right;
 
 
             case TokenType.GREATER_EQUAL:
                 checkNumberOperands(expr.operat, left, right);
-                return (double)left >= (double)right;
+                return (int)left >= (int)right;
 
             case TokenType.LESS:
                 checkNumberOperands(expr.operat, left, right);
-                return (double)left < (double)right;
+                return (int)left < (int)right;
 
             case TokenType.LESS_EQUAL:
                 checkNumberOperands(expr.operat, left, right);
-                return (double)left <= (double)right;
+                return (int)left <= (int)right;
 
             case TokenType.BANG_EQUAL: return !isEqual(left, right);
 
@@ -65,7 +67,7 @@ public class Interpreter : IVisitor<object>
             case TokenType.BANG:
                 return !isTruth(right);
             case TokenType.MINUS:
-                return -(double)right;
+                return -(int)right;
         }
         return null;
         // Unreachable.
@@ -80,10 +82,39 @@ public class Interpreter : IVisitor<object>
     {
         return expr.value;
     }
+
+    public object visitVar(Expr.Var expr)
+    {
+        return environment.get(expr.name);
+    }
     private object evaluate(Expr expr)
     {
         return expr.Accept(this);
     }
+
+    public void visitExprStmt(Stmt.Expression stmt)
+    {
+        evaluate(stmt.expression);
+    }
+    public void visitPrintStmt(Stmt.Print stmt)
+    {
+        object value = evaluate(stmt.expression);
+        Console.WriteLine(stringify(value));
+    }
+    public void visitVarStmt(Stmt.Var stmt)
+    {
+        object value = null;
+        if (stmt.initializer != null)  value = evaluate(stmt.initializer);
+        environment.define(stmt.name.lexeme, value);
+        
+    }
+    public object visitAssign(Expr.Assign expr)
+    {
+        object value = evaluate(expr.value);
+        environment.assign(expr.name, value);
+        return value;
+    }
+
 
     private bool isTruth(object obj)
     {
@@ -96,42 +127,49 @@ public class Interpreter : IVisitor<object>
         if (a == null && b == null) return true;
         if (a == null) return false;
 
-        return a == b;
+        return a != b;
     }
-
-    private static void checkNumberOperand(Token operat, object operand)
-    {
-        if (operand is double) return;
-        throw new RuntimeError(operat, "Operand must be a number.");
-    }
+    // private static void checkNumberOperand(Token operat, object operand)
+    // {
+    //     if (operand is int) return;
+    //     throw new RuntimeError(operat, "Operand must be a number.");
+    // }
     private void checkNumberOperands(Token operat, object left, object right)
     {
-        if (left is double && right is double) return;
+        if (left is int && right is int) return;
 
         throw new RuntimeError(operat, "Operands must be numbers.");
     }
 
-    public void interpret(Expr expression)
+    public void interpret(List<Stmt> statements)
     {
         try
         {
-            object value = evaluate(expression);
-            Console.WriteLine(stringify(value));
+         foreach (Stmt statement in statements)
+            {
+                execute(statement);
+            }
         }
         catch (RuntimeError error)
         {
             PixelWallE.runtimeError(error);
         }
     }
+    private void execute(Stmt stmt)
+    {
+        stmt.Accept(this);
+    }
      private string stringify(object obj)
     {
         if (obj == null) return "nil";
-        if (obj is double) {
-        string text = obj.ToString();
-        if (text.EndsWith(".0")) {
-        text = text.Substring(0, text.Length - 2);
-        }
-        return text;
+        if (obj is int)
+        {
+            string text = obj.ToString();
+            if (text.EndsWith(".0"))
+            {
+                text = text.Substring(0, text.Length - 2);
+            }
+            return text;
         }
         return obj.ToString();
     }

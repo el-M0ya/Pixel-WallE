@@ -10,7 +10,7 @@ public class PixelWallE
         if (args.Length > 1)
         {
             Console.WriteLine("Usage: cpw [script]");
-            Environment.Exit(64); // Bad Implementation Error
+            System.Environment.Exit(64); // Bad Implementation Error
         }
         else if (args.Length == 1) RunFile(args[0]);
 
@@ -21,8 +21,8 @@ public class PixelWallE
     {
         string code = File.ReadAllText(path);
         Run(code);
-        if (HadError) Environment.Exit(65);
-        if (HadRuntimeError) Environment.Exit(70);
+        if (HadError) System.Environment.Exit(65);
+        if (HadRuntimeError) System.Environment.Exit(70);
     }
     // Interactive Mode
     private static void RunPrompt()
@@ -43,10 +43,10 @@ public class PixelWallE
         List<Token> tokens = scanner.ScanTokens();
 
         Parser parser = new Parser(tokens);
-        Expr expression = parser.parse();
+        List<Stmt> statements = parser.parse();
         // Stop if there was a syntax error.
         if (HadError) return;
-        interpreter.interpret(expression);
+        interpreter.interpret(statements);
 
 
     }
@@ -54,7 +54,7 @@ public class PixelWallE
     {
         Report(line, "", message);
     }
-    public static void Error(Token token, String message)
+    public static void Error(Token token, string message)
     {
         if (token.type == TokenType.EOF)
         {
@@ -73,6 +73,6 @@ public class PixelWallE
     public static void runtimeError(RuntimeError error)
     {
         Console.WriteLine(error.getMessage()   +  "\n[line " + error.token.line + "]");
-        HadRuntimeError = true;+
+        HadRuntimeError = true;
     }
 }
