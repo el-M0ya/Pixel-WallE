@@ -3,6 +3,7 @@ namespace PixelWallEInterpreter;
 public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
 {
     private Environment environment = new Environment();
+    private int line = 1;
     public object visitBinary(Expr.Binary expr)
     {
         object left = evaluate(expr.left);
@@ -82,36 +83,80 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
     {
         return expr.value;
     }
+     public object visitLogical(Expr.Logical expr)
+    {
+        object left = evaluate(expr.left);
+        if (expr.operat.type == TokenType.OR) {
+        if (isTruth(left)) return left;
+        } else {
+        if (!isTruth(left)) return left;
+        }
+        return evaluate(expr.right);
+    }
 
     public object visitVar(Expr.Var expr)
     {
         return environment.get(expr.name);
     }
-    private object evaluate(Expr expr)
-    {
-        return expr.Accept(this);
-    }
+  
 
     public void visitExprStmt(Stmt.Expression stmt)
     {
         evaluate(stmt.expression);
     }
-    public void visitPrintStmt(Stmt.Print stmt)
+
+    public void visitSpawnStmt(Stmt.Spawn spawn)
     {
-        object value = evaluate(stmt.expression);
-        Console.WriteLine(stringify(value));
+        Console.WriteLine("Spawn");
+    }
+    public void visitColorStmt(Stmt.Color color)
+    {
+        Console.WriteLine("Color");
+    }
+    public void visitSizeStmt(Stmt.Size size)
+    {
+        Console.WriteLine("Size");
+    }
+    public void visitDrawLineStmt(Stmt.DrawLine drawLine)
+    {
+        Console.WriteLine("DrawLine");
+    }
+    public void visitDrawCircleStmt(Stmt.DrawCircle drawCircle)
+    {
+        Console.WriteLine("DrawCircle");
+    }
+    public void visitDrawRectangleStmt(Stmt.DrawRectangle drawRectangle)
+    {
+        Console.WriteLine("DrawRectangle");
+    }
+    public void visitFillStmt(Stmt.Fill fill)
+    {
+        Console.WriteLine("Fill");
+    }
+    public void visitGoToStmt(Stmt.GoTo stmt)
+    {
+        if (isTruth(stmt.condition))
+        {
+            line = environment.getLine(stmt.label);
+        }
     }
     public void visitVarStmt(Stmt.Var stmt)
     {
         object value = null;
-        if (stmt.initializer != null)  value = evaluate(stmt.initializer);
+        if (stmt.initializer != null) value = evaluate(stmt.initializer);
         environment.define(stmt.name.lexeme, value);
-        
+
     }
-    public object visitAssign(Expr.Assign expr)
+    public object visitAssignVar(Expr.Assign.Variable expr)
     {
         object value = evaluate(expr.value);
         environment.assign(expr.name, value);
+        return value;
+    }
+    public object visitAssignLabel(Expr.Assign.Label expr)
+    {
+        object value = evaluate(expr.value);
+        environment.assignlabel(expr.name, line );
         return value;
     }
 
@@ -140,14 +185,20 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
 
         throw new RuntimeError(operat, "Operands must be numbers.");
     }
+    
+      private object evaluate(Expr expr)
+    {
+        return expr.Accept(this);
+    }
 
     public void interpret(List<Stmt> statements)
     {
         try
         {
-         foreach (Stmt statement in statements)
+            while (line <= statements.Count)
             {
-                execute(statement);
+                execute(statements[line]);    
+                line++;
             }
         }
         catch (RuntimeError error)
