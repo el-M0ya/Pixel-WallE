@@ -25,7 +25,7 @@ public class Scanner
         {"GetActualY", TokenType.GETACTUALY},
         {"GetCanvaSize", TokenType.GETCANVASIZE},
         {"GetCanvaColorCount", TokenType.GETCOLORCOUNT},
-        {"IsColor", TokenType.ISCOLOR},
+        {"IsCanvasColor", TokenType.ISCANVASCOLOR},
         {"IsBrushColor", TokenType.ISBRUSHCOLOR},
         {"IsBrushSize", TokenType.ISBRUSHSIZE},
 

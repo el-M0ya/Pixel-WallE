@@ -16,30 +16,30 @@ namespace PW;
 
 public class Wall_E
 {
+    public bool isSpawn = false;
     public int x;
     public int y;
     public string currentColor;
     public int brushSize;
+    public static Wall_E Instance{get; private set;}
     public Wall_E(int x, int y, string currentColor, int brushSize)
     {
+        if (Instance == null) Instance = this;
+        else throw new Exception("Many Wall_E's in scene");
         this.x = x;
         this.y = y;
         this.currentColor = currentColor;
         this.brushSize = brushSize;
     }
 }
-
-
-
 public partial class MainWindow : Window
 {
-    private Wall_E walle;
-    private TextEditor? CodeEditor;
-    private WriteableBitmap? _canvasBitmap;
-    private int _canvasDimension = 32; // Tamaño por defecto NxN
-    private Color[,] _logicalPixelData; // Representación lógica de los colores en el canvas (opcional pero útil)
+    public Wall_E walle;
+    private static WriteableBitmap? _canvasBitmap;
+    private static int _canvasDimension = 32; // Tamaño por defecto NxN
+    private static Color[,] _logicalPixelData; // Representación lógica de los colores en el canvas (opcional pero útil)
     private bool isWallEImage = false;
-    private readonly Dictionary<string, Color> _colorNameMap = new Dictionary<string, Color>(StringComparer.OrdinalIgnoreCase)
+    private static readonly Dictionary<string, Color> _colorNameMap = new Dictionary<string, Color>(StringComparer.OrdinalIgnoreCase)
         {
             { "Black", Colors.Black }, { "White", Colors.White },
             { "Red", Colors.Red }, { "Green", Colors.Green },
@@ -47,7 +47,7 @@ public partial class MainWindow : Window
             { "Orange", Colors.Orange }, { "Purple", Colors.Purple },
             { "Transparent", Colors.Transparent }
         };
-    private Color _defaultCanvasColor = Colors.White; // El canvas inicia en blanco
+    private static Color _defaultCanvasColor = Colors.White; // El canvas inicia en blanco
 
     // Referencias a los controles (se asignan en el constructor después de InitializeComponent)
     private NumericUpDown? CanvasSizeTextBox;
@@ -56,8 +56,8 @@ public partial class MainWindow : Window
     private Button? LoadScriptButton;
     private Button? SaveScriptButton;
     private TextEditor? CodeEditorTextBox;
-    private Image? PixelCanvasImage;
-    private TextBlock? StatusOutputTextBlock;
+    private static Image? PixelCanvasImage;
+    private static TextBlock? StatusOutputTextBlock;
     private TextBlock? WallEStatusXTextBlock;
     private TextBlock? WallEStatusYTextBlock;
     private TextBlock? WallEStatusColorTextBlock;
@@ -98,7 +98,7 @@ public partial class MainWindow : Window
         CreateOrResizeCanvas(_canvasDimension);
 
         interpreter = new PixelWallE();
-        walle = new Wall_E(-1 , -1 , "Transparent" , 1);
+        walle = new Wall_E(1, 1, "Red", 1);
     }
 
     private void InitializeComponent()
@@ -173,19 +173,17 @@ public partial class MainWindow : Window
         }
         PixelCanvasImage?.InvalidateVisual(); // Forzar redibujado
     }
-    public void SetPixelOnCanvas(int x, int y, string colorName, int brushRawSize)
+    public static void Paint(int x, int y, string colorName, int brushRawSize)
     {
         if (_canvasBitmap == null) return;
         if (x < 0 || x >= _canvasDimension || y < 0 || y >= _canvasDimension)
         {
-            SetStatus($"Intento de dibujar fuera del canvas en ({x},{y}).", true);
-            return;
+            throw new RuntimeError($"Intento de dibujar fuera del canvas en ({x},{y}).");
         }
 
         if (!_colorNameMap.TryGetValue(colorName, out Color avaloniaColor))
         {
-            SetStatus($"Color '{colorName}' no reconocido.", true);
-            avaloniaColor = Colors.Fuchsia; // Color de error visual
+            throw new RuntimeError($"Color '{colorName}' no reconocido.");
         }
 
         // "Utilizar el color transparente implica no realizar ningún cambio sobre el canvas."
@@ -226,9 +224,14 @@ public partial class MainWindow : Window
             }
         }
         PixelCanvasImage?.InvalidateVisual(); // Podrías invalidar solo la región afectada para optimizar
+        SetStatus("pintando", false);
+    }
+    public static void PaintInWallE()
+    {
+        Paint(Wall_E.Instance.x, Wall_E.Instance.y, Wall_E.Instance.currentColor, Wall_E.Instance.brushSize);
     }
 
-    public Color GetPixelColorFromCanvas(int x, int y)
+    public static Color GetPixelColorFromCanvas(int x, int y)
     {
         if (x < 0 || x >= _canvasDimension || y < 0 || y >= _canvasDimension)
         {
@@ -237,14 +240,13 @@ public partial class MainWindow : Window
         return _logicalPixelData[x, y];
     }
 
-    public int GetCanvasCurrentDimension() => _canvasDimension;
 
-    public bool IsValidColorName(string colorName) => _colorNameMap.ContainsKey(colorName);
+    public static bool IsValidColorName(string colorName) => _colorNameMap.ContainsKey(colorName);
 
-    public Color GetAvaloniaColorByName(string colorName)
+    public static Color GetAvaloniaColor(string colorName)
     {
-        _colorNameMap.TryGetValue(colorName, out Color c);
-        return c; // Devuelve color por defecto (negro Transparente) si no se encuentra. Tu intérprete debe validar.
+        if (IsValidColorName(colorName)) return _colorNameMap[colorName];
+        else throw new Exception("Invalid color name");
     }
 
     private void _ResizeCanvasButton_Click(object? sender, RoutedEventArgs e)
@@ -269,15 +271,9 @@ public partial class MainWindow : Window
         string code = CodeEditorTextBox.Text;
         SetStatus("Ejecutando código...", false);
 
-        // AQUÍ LLAMAS A TU INTÉRPRETE
+
         interpreter.Run(code);
 
-        // Ejemplo de prueba directa (borrar o comentar después):
-        // SetPixelOnCanvas(0, 0, "Red", 1);
-        // SetPixelOnCanvas(1, 1, "Green", 3);
-        // SetPixelOnCanvas(_canvasDimension - 1, _canvasDimension - 1, "Blue", 1);
-        // SetStatus("Prueba de dibujo completada.", false);
-        // UpdateWallEStatusDisplay(1,1,"Green",3); // Ejemplo
     }
 
     private async void _LoadScriptButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
@@ -337,13 +333,13 @@ public partial class MainWindow : Window
     }
 
     // --- Utilidades ---
-    private uint ConvertAvaloniaColorToUint32(Color color)
+    private static uint ConvertAvaloniaColorToUint32(Color color)
     {
         // Formato BGRA8888: Blue en el byte menos significativo
         return (uint)(color.B | (color.G << 8) | (color.R << 16) | (color.A << 24));
     }
 
-    public void SetStatus(string message, bool isError)
+    public static void SetStatus(string message, bool isError)
     {
         if (StatusOutputTextBlock == null) return;
         StatusOutputTextBlock.Text = message;
@@ -358,20 +354,122 @@ public partial class MainWindow : Window
         if (WallEStatusColorTextBlock != null) WallEStatusColorTextBlock.Text = $"Color Pincel: {walle.currentColor}";
         if (WallEStatusSizeTextBlock != null) WallEStatusSizeTextBlock.Text = $"Tamaño Pincel: {walle.brushSize}";
     }
-
-    public void Spawn(int x, int y)
+    public static void MoveWalle(int x, int y)
     {
-        walle.x = x;
-        walle.y = y;
+        Wall_E.Instance.x = x;
+        Wall_E.Instance.y = y;
+    }
+    public static void Spawn(int x, int y)
+    {
+        SetStatus("Is Working", false);
+        if (Wall_E.Instance.isSpawn)
+        {
+            throw new RuntimeError("1");
+        }    
+        MoveWalle(x, y);
+        Wall_E.Instance.isSpawn = true;
 
     }
-    // Implementa aquí los métodos que tu intérprete llamará para dibujar y consultar el canvas.
-    // Por ejemplo, los métodos de ICanvasController si usas esa interfaz.
-    // public (int newX, int newY) DrawLine(...) { ... }
-    // public void Fill(...) { ... }
+
+    public static void Color(string color)
+    {
+        if (_colorNameMap.ContainsKey(color)) Wall_E.Instance.currentColor = color;
+        // else
+        // {
+        //     throw new RuntimeError("Wrong Color");
+        // }
+        
+    }
+    public static void Size(int size)
+    {
+        Wall_E.Instance.brushSize = size;
+    }
+    public static void DrawLine(int dirx, int diry, int distance)
+    {
+        if (dirx < -1 || dirx > 1 || diry < -1 || diry > 1) throw new RuntimeError("Parameters out of range: directions are between -1 and 1");
+        if (distance < 0) DrawLine(-dirx, -diry, -distance);
+
+        for (int i = 0; i < distance; i++)
+        {
+            MoveWalle(dirx, diry);
+            PaintInWallE();
+            distance--;
+        }
+    }
+    public static void DrawCircle(int dirx, int diry, int r)
+    {
+        //MoveWalle(walle.x + r*dirx , walle.y + r*diry );
 
 
-    // Colores soportados por el lenguaje y su mapeo a Avalonia.Color
 
+
+    }
+    public static void DrawRectangle(int dirx, int diry, int distance, int width, int high)
+    {
+        //MoveWalle(walle.x + r*dirx , walle.y + r*diry );
+
+
+
+
+    }
+    public static void Fill()
+    {
+        Color color = GetPixelColorFromCanvas(Wall_E.Instance.x, Wall_E.Instance.y);
+        // Change 0s for walle.x , walle.y
+        Fill(Wall_E.Instance.x, Wall_E.Instance.y, color);
+
+    }
+    private static void Fill(int x, int y, Color color)
+    {
+        if (color != GetPixelColorFromCanvas(x, y)) return;
+
+        Fill(x + 1, y, color);
+        Fill(x - 1, y, color);
+        Fill(x, y + 1, color);
+        Fill(x, y - 1, color);
+    }
+
+    public static int GetActualX() => Wall_E.Instance.x;
+    public static int GetActualY() => Wall_E.Instance.y;
+    public static int GetCanvasSize() => _canvasDimension;
+    public static int GetColorCount(string color, int x1, int y1, int x2, int y2)
+    {
+        if (x1 > x2) return GetColorCount(color, x2, y1, x1, y2);
+        if (y1 > y2) return GetColorCount(color, x1, y2, x2, y1);
+
+        int count = 0;
+        for (int i = x1; i <= x2; i++)
+        {
+            for (int j = y1; j <= y2; j++)
+            {
+                if (GetPixelColorFromCanvas(i , j) == _colorNameMap[color]) count++;
+            }
+        }
+        return count;
+    }
+    public static int IsBrushColor(string color)
+    {
+        
+        return color == Wall_E.Instance.currentColor ? 1 : 0;
+    }
+    public static int IsBrushSize(int size)
+    {
+        return size == Wall_E.Instance.brushSize ? 1 : 0;
+    }
+    public static int IsCanvasColor(string color, int vertical, int horizontal)
+    {
+        
+        return GetPixelColorFromCanvas(Wall_E.Instance.x + vertical, 
+                                       Wall_E.Instance.y + horizontal) == _colorNameMap[color] ? 1 : 0;
+    }
+
+    // public static string GetColor()
+    // {
+    //     return GetColor(/*Walle.x , walle.y*/);
+    // }
+    // public static string GetColor(int x , int y)
+    // {
+    //     return "";
+    // }
 
 }

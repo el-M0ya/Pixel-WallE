@@ -19,7 +19,14 @@ public class Parser
 
     private Expr expression()
     {
-        return assignment();
+        if (match([TokenType.GETACTUALX])) return GetActualX();
+        if (match([TokenType.GETACTUALY])) return GetActualY();
+        if (match([TokenType.GETCANVASIZE])) return GetCanvasSize();
+        if (match([TokenType.GETCOLORCOUNT])) return GetColorCount();
+        if (match([TokenType.ISBRUSHSIZE])) return IsBrushSize();
+        if (match([TokenType.ISBRUSHCOLOR])) return IsBrushColor();
+        if (match([TokenType.ISCANVASCOLOR])) return IsCanvasColor();
+        else return assignment();
     }
     private Stmt declaration()
     {
@@ -85,9 +92,11 @@ public class Parser
 
         return new Stmt.GoTo(label, condition);
     }
+
+    // Instructions
     private Stmt SpawnStatement()
     {
-        consume(TokenType.LEFT_PAREN, "Expect '(' after 'Spawn' function'.");
+        consume(TokenType.LEFT_PAREN, "Expect '(' after 'Spawn' Instruction'.");
 
         Expr x = expression();
         consume(TokenType.COMMA, "Expect ',' after 'x'.");
@@ -101,7 +110,7 @@ public class Parser
     }
     private Stmt ColorStatement()
     {
-        consume(TokenType.LEFT_PAREN, "Expect '(' after 'Color' function'.");
+        consume(TokenType.LEFT_PAREN, "Expect '(' after 'Color' Instruction'.");
 
         Expr color = expression();
 
@@ -114,7 +123,7 @@ public class Parser
 
     private Stmt SizeStatement()
     {
-        consume(TokenType.LEFT_PAREN, "Expect '(' after 'Size' function'.");
+        consume(TokenType.LEFT_PAREN, "Expect '(' after 'Size' Instruction'.");
 
         Expr k = expression();
         
@@ -127,7 +136,7 @@ public class Parser
     }
     private Stmt DrawLineStatement()
     {
-        consume(TokenType.LEFT_PAREN, "Expect '(' after 'DrawLine' function'.");
+        consume(TokenType.LEFT_PAREN, "Expect '(' after 'DrawLine' Instruction'.");
 
         Expr dirX = expression();
         consume(TokenType.COMMA, "Expect ',' after 'dirX'.");
@@ -144,7 +153,7 @@ public class Parser
 
     private Stmt DrawCircleStatement()
     {
-        consume(TokenType.LEFT_PAREN, "Expect '(' after 'DrawCircle' function'.");
+        consume(TokenType.LEFT_PAREN, "Expect '(' after 'DrawCircle' Instruction'.");
 
         Expr dirX = expression();
         consume(TokenType.COMMA, "Expect ',' after 'dirX'.");
@@ -160,7 +169,7 @@ public class Parser
     }
     private Stmt DrawRectangleStatement()
     {
-        consume(TokenType.LEFT_PAREN, "Expect '(' after 'DrawCircle' function'.");
+        consume(TokenType.LEFT_PAREN, "Expect '(' after 'DrawCircle' Instruction'.");
 
         Expr dirX = expression();
         consume(TokenType.COMMA, "Expect ',' after 'dirX'.");
@@ -180,13 +189,95 @@ public class Parser
     }
     private Stmt FillStatement()
     {
-        consume(TokenType.LEFT_PAREN, "Expect '(' after 'Fill' function'.");
+        consume(TokenType.LEFT_PAREN, "Expect '(' after 'Fill' Instruction'.");
         consume(TokenType.RIGHT_PAREN, "Expect ')' after '('.");
         consume(TokenType.JUMPLINE, "Expect 'line'.");
 
         // Fix with walle.x and walle.y 
         return new Stmt.Fill(0, 0);
     }
+
+    // Functions
+
+    private Expr GetActualX()
+    {
+        consume(TokenType.LEFT_PAREN, "Expect '(' after 'GetActualX' function'.");
+        consume(TokenType.RIGHT_PAREN, "Expect ')' after '('.");
+        consume(TokenType.JUMPLINE, "Expect 'line'.");
+
+        return new Expr.GetActualX();
+    }
+    private Expr GetActualY()
+    {
+        consume(TokenType.LEFT_PAREN, "Expect '(' after 'GetActualX' function'.");
+        consume(TokenType.RIGHT_PAREN, "Expect ')' after '('.");
+        consume(TokenType.JUMPLINE, "Expect 'line'.");
+
+        return new Expr.GetActualY();
+    }
+    private Expr GetCanvasSize()
+    {
+        consume(TokenType.LEFT_PAREN, "Expect '(' after 'GetActualX' function'.");
+        consume(TokenType.RIGHT_PAREN, "Expect ')' after '('.");
+        consume(TokenType.JUMPLINE, "Expect 'line'.");
+
+        return new Expr.GetCanvasSize();
+    }
+    private Expr GetColorCount()
+    {
+        consume(TokenType.LEFT_PAREN, "Expect '(' after 'GetActualX' function'.");
+
+        Expr color = expression();
+        consume(TokenType.COMMA, "Expect ',' after 'dirX'.");
+       Expr x1 = expression();
+        consume(TokenType.COMMA, "Expect ',' after 'dirY'.");
+        Expr y1 = expression();
+        consume(TokenType.COMMA, "Expect ',' after 'distance'.");
+        Expr x2 = expression();
+        consume(TokenType.COMMA, "Expect ',' after 'width'.");
+        Expr y2 = expression();
+
+        consume(TokenType.RIGHT_PAREN, "Expect ')' after '('.");
+        consume(TokenType.JUMPLINE, "Expect 'line'.");
+
+        return new Expr.GetColorCount(color , x1 , y1 , x2 , y2);
+    }
+    private Expr IsBrushSize()
+    {
+        consume(TokenType.LEFT_PAREN, "Expect '(' after 'GetActualX' function'.");
+        Expr size = expression();
+        consume(TokenType.RIGHT_PAREN, "Expect ')' after '('.");
+        consume(TokenType.JUMPLINE, "Expect 'line'.");
+
+        return new Expr.IsBrushSize(size);
+    }
+    private Expr IsBrushColor()
+    {
+        consume(TokenType.LEFT_PAREN, "Expect '(' after 'GetActualX' function'.");
+        Expr color = expression();
+        consume(TokenType.RIGHT_PAREN, "Expect ')' after '('.");
+        consume(TokenType.JUMPLINE, "Expect 'line'.");
+
+        return new Expr.IsBrushColor(color);
+    }
+    private Expr IsCanvasColor()
+    {
+        consume(TokenType.LEFT_PAREN, "Expect '(' after 'GetActualX' function'.");
+
+        Expr color = expression();
+        consume(TokenType.COMMA, "Expect ',' after 'dirX'.");
+       Expr x = expression();
+        consume(TokenType.COMMA, "Expect ',' after 'dirY'.");
+        Expr y = expression();
+
+        consume(TokenType.RIGHT_PAREN, "Expect ')' after '('.");
+        consume(TokenType.JUMPLINE, "Expect 'line'.");
+
+        return new Expr.IsCanvasColor(color , x , y);
+    }
+    
+    
+
     
 
     private Expr equality()

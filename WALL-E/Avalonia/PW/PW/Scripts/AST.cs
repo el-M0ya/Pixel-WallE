@@ -101,90 +101,93 @@ public abstract class Expr
             return visitor.visitVar(this);
         }
     }
-    // public class GetActualX : Expr
-    // {
-    //     public Token name;
-    //     public GetActualX(Token name)
-    //     {
-    //         this.name = name;
-    //     }
-    //     public override T Accept<T>(IVisitor<T> visitor)
-    //     {
-    //         return visitor.visitGetActualX(this);
-    //     }
-    // }
-    // public class GetActualY : Expr
-    // {
-    //     public Token name;
-    //     public GetActualY(Token name)
-    //     {
-    //         this.name = name;
-    //     }
-    //     public override T Accept<T>(IVisitor<T> visitor)
-    //     {
-    //         return visitor.visitGetActualY(this);
-    //     }
-    // }
-    // public class GetCanvasSize : Expr
-    // {
-    //     public Token name;
-    //     public GetCanvasSize(Token name)
-    //     {
-    //         this.name = name;
-    //     }
-    //     public override T Accept<T>(IVisitor<T> visitor)
-    //     {
-    //         return visitor.visitGetCanvasSize(this);
-    //     }
-    // }
-    // public class GetColorCount : Expr
-    // {
-    //     public Token name;
-    //     public GetColorCount(Token name)
-    //     {
-    //         this.name = name;
-    //     }
-    //     public override T Accept<T>(IVisitor<T> visitor)
-    //     {
-    //         return visitor.visitGetColorCount(this);
-    //     }
-    // }
-    // public class IsBrushColor : Expr
-    // {
-    //     public Token name;
-    //     public IsBrushColor(Token name)
-    //     {
-    //         this.name = name;
-    //     }
-    //     public override T Accept<T>(IVisitor<T> visitor)
-    //     {
-    //         return visitor.visitIsBrushColor(this);
-    //     }
-    // }
-    // public class IsBrushSize : Expr
-    // {
-    //     public Token name;
-    //     public IsBrushSize(Token name)
-    //     {
-    //         this.name = name;
-    //     }
-    //     public override T Accept<T>(IVisitor<T> visitor)
-    //     {
-    //         return visitor.visitIsBrushSize(this);
-    //     }
-    // }
-    // public class IsCanvasColor : Expr
-    // {
-    //     public Token name;
-    //     public IsCanvasColor(Token name)
-    //     {
-    //         this.name = name;
-    //     }
-    //     public override T Accept<T>(IVisitor<T> visitor)
-    //     {
-    //         return visitor.visitIsCanvasColor(this);
-    //     }
-    // }
+    public class GetActualX : Expr
+    {
+        
+        public GetActualX(){ }
+        public override T Accept<T>(IVisitor<T> visitor)
+        {
+            return visitor.visitGetActualX(this);
+        }
+    }
+    public class GetActualY : Expr
+    {
+        public GetActualY(){ }
+        public override T Accept<T>(IVisitor<T> visitor)
+        {
+            return visitor.visitGetActualY(this);
+        }
+    }
+    public class GetCanvasSize : Expr
+    {
+        public GetCanvasSize(){ }
+        public override T Accept<T>(IVisitor<T> visitor)
+        {
+            return visitor.visitGetCanvasSize(this);
+        }
+    }
+    public class GetColorCount : Expr
+    {
+        public Expr color;
+        public Expr x1;
+        public Expr y1;
+        public Expr x2;
+        public Expr y2;
+
+
+        public GetColorCount(Expr color, Expr x1, Expr y1, Expr x2, Expr y2)
+        {
+            this.color = color;
+            this.x1 = x1;
+            this.y1 = y1;
+            this.x2 = x2;
+            this.y2 = y2;
+        }
+        public override T Accept<T>(IVisitor<T> visitor)
+        {
+            return visitor.visitGetColorCount(this);
+        }
+    }
+    public class IsBrushColor : Expr
+    {
+        public Expr color;
+        public IsBrushColor(Expr color)
+        {
+            this.color = color;
+        }
+        public override T Accept<T>(IVisitor<T> visitor)
+        {
+            return visitor.visitIsBrushColor(this);
+        }
+    }
+    public class IsBrushSize : Expr
+    {
+        public Expr size;
+        public IsBrushSize(Expr size)
+        {
+            this.size = size;
+        }
+        public override T Accept<T>(IVisitor<T> visitor)
+        {
+            return visitor.visitIsBrushSize(this);
+        }
+    }
+    public class IsCanvasColor : Expr
+    {
+        public Expr color;
+        public Expr x;
+        public Expr y;
+        public IsCanvasColor(Expr color , Expr x , Expr y)
+        {
+            this.color = color;
+            this.x = x;
+            this.y = y;
+        }
+        public override T Accept<T>(IVisitor<T> visitor)
+        {
+            return visitor.visitIsCanvasColor(this);
+        }
+    }
     public interface IVisitor<T>
     {
         T visitBinary(Binary binary);
@@ -194,13 +197,13 @@ public abstract class Expr
         T visitVar(Var expr);
         T visitAssign(Assign expr);
         T visitLogical(Logical expr);
-        // T visitGetActualX(GetActualX expr);
-        // T visitGetActualY(GetActualY expr);
-        // T visitGetCanvasSize(GetCanvasSize expr);
-        // T visitGetColorCount(GetColorCount expr);
-        // T visitIsBrushColor(IsBrushColor expr);
-        // T visitIsBrushSize(IsBrushSize expr);
-        // T visitIsCanvasColor(IsCanvasColor expr);
+        T visitGetActualX(GetActualX expr);
+        T visitGetActualY(GetActualY expr);
+        T visitGetCanvasSize(GetCanvasSize expr);
+        T visitGetColorCount(GetColorCount expr);
+        T visitIsBrushColor(IsBrushColor expr);
+        T visitIsBrushSize(IsBrushSize expr);
+        T visitIsCanvasColor(IsCanvasColor expr);
     }
 
 
@@ -242,7 +245,6 @@ public abstract class Stmt
         public Color(Expr color)
         {
             this.color = color;
-
         }
         public override void Accept(IVisitor visitor)
         {

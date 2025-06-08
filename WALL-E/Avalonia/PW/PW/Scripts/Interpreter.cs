@@ -22,7 +22,7 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
                 {
                     return (string)left + (string)right;
                 }
-                throw new RuntimeError(expr.operat, "Operands must be two numbers or two strings.");
+                throw new RuntimeError("Operands must be two numbers or two strings.");
 
             case TokenType.MINUS:
                 checkNumberOperands(expr.operat, left, right);
@@ -30,7 +30,7 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
 
             case TokenType.SLASH:
                 checkNumberOperands(expr.operat, left, right);
-                if ((int)right == 0) throw new RuntimeError(expr.operat, "Division by 0 is not defined");
+                if ((int)right == 0) throw new RuntimeError("Division by 0 is not defined");
                 return (int)left / (int)right;
 
             case TokenType.STAR:
@@ -101,7 +101,50 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
     {
         return environment.get(expr.name);
     }
-  
+
+    public object visitGetActualX(Expr.GetActualX expr)
+    {
+        return MainWindow.GetActualX();
+    }
+    public object visitGetActualY(Expr.GetActualY expr)
+    {
+        return MainWindow.GetActualY();
+    }
+    public object visitGetCanvasSize(Expr.GetCanvasSize expr)
+    {
+        return MainWindow.GetCanvasSize();
+    }
+    public object visitGetColorCount(Expr.GetColorCount expr)
+    {
+        checkString(expr.color, "GetColorCount.color");
+        checkNumber(expr.x1, "GetColorCount.x1");
+        checkNumber(expr.y1, "GetColorCount.y1");
+        checkNumber(expr.x2, "GetColorCount.x2");
+        checkNumber(expr.y2, "GetColorCount.y2");
+        return MainWindow.GetColorCount(   stringify(evaluate(expr.color)),
+                                        (int)evaluate(expr.x1) ,(int)evaluate( expr.y1),
+                                        (int)evaluate(expr.x2) , (int)evaluate(expr.y2));
+    }
+    public object visitIsBrushSize(Expr.IsBrushSize expr)
+    {
+        checkNumber(expr.size, "IsBrushSize.size");
+        return MainWindow.IsBrushSize((int)evaluate(expr.size));
+    }
+    public object visitIsBrushColor(Expr.IsBrushColor expr)
+    {
+        checkString(expr.color, "IsBrushColor.color");
+        return MainWindow.IsBrushColor(stringify(evaluate(expr.color)));
+    }
+    public object visitIsCanvasColor(Expr.IsCanvasColor expr)
+    {
+
+        checkString(expr.color, "IsCanvasColor.color");
+        checkNumber(expr.x, "IsCanvasColor.x");
+        checkNumber(expr.y, "IsCanvasColor.y");
+
+        return MainWindow.IsCanvasColor(stringify(evaluate(expr.color)),
+                                        (int)evaluate(expr.x), (int)evaluate(expr.y));
+    }
 
     public void visitExprStmt(Stmt.Expression stmt)
     {
@@ -110,28 +153,51 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
 
     public void visitSpawnStmt(Stmt.Spawn spawn)
     {
-        // Estoy cansado , jefe
-        
+        checkNumber(spawn.x, "Spawn.x");
+        checkNumber(spawn.y, "Spawn.y");
+        int x = (int)evaluate(spawn.x);
+        int y = (int)evaluate(spawn.y);
+        MainWindow.Spawn(x, y);
+        MainWindow.SetStatus("atudddd", true);
     }
     public void visitColorStmt(Stmt.Color color)
     {
-        Console.WriteLine("Color");
+        checkString(color.color , "Color");
+        string newcolor = stringify(color);
+        MainWindow.Color(newcolor);
     }
     public void visitSizeStmt(Stmt.Size size)
     {
-        Console.WriteLine("Size");
+        checkNumber(size.size, "Size.size");
+        int newsize = (int)evaluate(size.size);
+        MainWindow.Size(newsize);
     }
     public void visitDrawLineStmt(Stmt.DrawLine drawLine)
     {
-        Console.WriteLine("DrawLine");
+        checkNumber(drawLine.dirX, "DrawLine.dirX");
+        checkNumber(drawLine.dirY, "DrawLine.dirY");
+        checkNumber(drawLine.distance, "DrawLine.distance");
+        int x = (int)evaluate(drawLine.dirX);
+        int y = (int)evaluate(drawLine.dirY);
+        int distance = (int)evaluate(drawLine.distance);
+        MainWindow.DrawLine(x , y , distance);
     }
     public void visitDrawCircleStmt(Stmt.DrawCircle drawCircle)
     {
-        Console.WriteLine("DrawCircle");
+        int x = (int)evaluate(drawCircle.dirX);
+        int y = (int)evaluate(drawCircle.dirY);
+        int radius = (int)evaluate(drawCircle.radius);
+        MainWindow.DrawLine(x , y , radius);
     }
     public void visitDrawRectangleStmt(Stmt.DrawRectangle drawRectangle)
     {
-        Console.WriteLine("DrawRectangle");
+        int x = (int)evaluate(drawRectangle.dirX);
+        int y = (int)evaluate(drawRectangle.dirY);
+        int distance = (int)evaluate(drawRectangle.distance);
+        int width = (int)evaluate(drawRectangle.width);
+        int height = (int)evaluate(drawRectangle.height);
+
+        MainWindow.DrawRectangle(x , y , distance , width , height);
     }
     public void visitFillStmt(Stmt.Fill fill)
     {
@@ -178,15 +244,15 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
 
         return a != b;
     }
-    private  void checkNumber(Token operat, Expr operand , string where)
+    private  void checkNumber(Expr operand , string where)
     {
         if (evaluate(operand) is int) return;
-        throw new RuntimeError(operat, $"{where} must be a number.");
+        throw new RuntimeError($"{where} must be a number.");
     }
-    private  void checkString(Token operat, object operand , string where)
+    private  void checkString(object operand , string where)
     {
         if (operand is string) return;
-        throw new RuntimeError(operat, $"{where} must be a string.");
+        throw new RuntimeError($"{where} must be a string.");
     }
     private void checkNumberOperands(Token operat, object left, object right)
     {
@@ -206,7 +272,7 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
         {
             while (line <= statements.Count)
             {
-                execute(statements[line - 1]);    
+                execute(statements[line - 1]);
                 line++;
             }
         }
@@ -219,18 +285,18 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
     {
         stmt.Accept(this);
     }
-    //  private string stringify(object obj)
-    // {
-    //     if (obj == null) return "nil";
-    //     if (obj is int)
-    //     {
-    //         string text = obj.ToString();
-    //         if (text.EndsWith(".0"))
-    //         {
-    //             text = text.Substring(0, text.Length - 2);
-    //         }
-    //         return text;
-    //     }
-    //     return obj.ToString();
-    // }
+     private string stringify(object obj)
+    {
+        if (obj == null) return "null";
+        if (obj is int)
+        {
+            string text = obj.ToString();
+            if (text.EndsWith(".0"))
+            {
+                text = text.Substring(0, text.Length - 2);
+            }
+            return text;
+        }
+        return obj.ToString();
+    }
 }

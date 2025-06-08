@@ -38,7 +38,7 @@ public class PixelWallE
     }
     public  void Run(string source)
     {
-        
+        HadError = false;
         Scanner scanner = new Scanner(source);
         List<Token> tokens = scanner.ScanTokens();
 
@@ -46,7 +46,9 @@ public class PixelWallE
         List<Stmt> statements = parser.parse();
         // Stop if there was a syntax error.
         if (HadError) return;
+        
         interpreter.interpret(statements);
+        MainWindow.SetStatus($"Ejecutando", false); 
     }
 
     public static void SaveFile(string code, string path)
@@ -73,7 +75,7 @@ public class PixelWallE
         {
             if (!File.Exists(path))
             {
-                throw new FileNotFoundException($"File not found: {path}");
+                throw new RuntimeError($"File not found: {path}");
             }
             string code = File.ReadAllText(path);
             return code;
@@ -81,7 +83,7 @@ public class PixelWallE
         catch (Exception error)
         {
 
-            Console.WriteLine($"Import Error:{error.Message}");
+            MainWindow.SetStatus($"Import Error:{error.Message}" , true);
             return null;
         }
     }
@@ -104,12 +106,12 @@ public class PixelWallE
     }
     private static void Report(int line, string where, string message)
     {
-        Console.WriteLine("[line " + line + "] Error" + where + ": " + message);
+        MainWindow.SetStatus("[line " + line + "] Error" + where + ": " + message , true);
         HadError = true;
     }
     public static void runtimeError(RuntimeError error)
     {
-        Console.WriteLine(error.getMessage()   +  "\n[line " + error.token.line + "]");
+        MainWindow.SetStatus(error.getMessage()   +  "\n[line " + error.token.line + "]" , true);
         HadRuntimeError = true;
     }
 }
