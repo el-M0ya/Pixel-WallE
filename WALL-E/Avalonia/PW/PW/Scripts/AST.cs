@@ -128,6 +128,7 @@ public abstract class Expr
     }
     public class GetColorCount : Expr
     {
+        public Token name;
         public Expr color;
         public Expr x1;
         public Expr y1;
@@ -135,8 +136,9 @@ public abstract class Expr
         public Expr y2;
 
 
-        public GetColorCount(Expr color, Expr x1, Expr y1, Expr x2, Expr y2)
+        public GetColorCount(Token name , Expr color, Expr x1, Expr y1, Expr x2, Expr y2)
         {
+            this.name = name;
             this.color = color;
             this.x1 = x1;
             this.y1 = y1;
@@ -150,9 +152,11 @@ public abstract class Expr
     }
     public class IsBrushColor : Expr
     {
+        public Token name;
         public Expr color;
-        public IsBrushColor(Expr color)
+        public IsBrushColor(Token name , Expr color)
         {
+            this.name = name;
             this.color = color;
         }
         public override T Accept<T>(IVisitor<T> visitor)
@@ -162,9 +166,11 @@ public abstract class Expr
     }
     public class IsBrushSize : Expr
     {
+        public Token name;
         public Expr size;
-        public IsBrushSize(Expr size)
+        public IsBrushSize(Token name , Expr size)
         {
+            this.name = name;
             this.size = size;
         }
         public override T Accept<T>(IVisitor<T> visitor)
@@ -174,11 +180,13 @@ public abstract class Expr
     }
     public class IsCanvasColor : Expr
     {
+        public Token name;
         public Expr color;
         public Expr x;
         public Expr y;
-        public IsCanvasColor(Expr color , Expr x , Expr y)
+        public IsCanvasColor(Token name , Expr color , Expr x , Expr y)
         {
+            this.name = name;
             this.color = color;
             this.x = x;
             this.y = y;
@@ -205,8 +213,6 @@ public abstract class Expr
         T visitIsBrushSize(IsBrushSize expr);
         T visitIsCanvasColor(IsCanvasColor expr);
     }
-
-
 }
 public abstract class Stmt
 {
@@ -222,14 +228,15 @@ public abstract class Stmt
         {
             visitor.visitExprStmt(this);
         }
-
     }
     public class Spawn : Stmt
     {
+        public Token name;
         public Expr x;
         public Expr y;
-        public Spawn(Expr x, Expr y)
+        public Spawn(Token name , Expr x, Expr y)
         {
+            this.name = name;
             this.x = x;
             this.y = y;
         }
@@ -240,10 +247,12 @@ public abstract class Stmt
     }
     public class Color : Stmt
     {
+        public Token name;
         public Expr color;
 
-        public Color(Expr color)
+        public Color(Token name , Expr color)
         {
+            this.name = name;
             this.color = color;
         }
         public override void Accept(IVisitor visitor)
@@ -253,10 +262,12 @@ public abstract class Stmt
     }
     public class Size : Stmt
     {
+        public Token name;
         public Expr size;
 
-        public Size(Expr size)
+        public Size ( Token name , Expr size)
         {
+            this.name = name;
             this.size = size;
         }
         public override void Accept(IVisitor visitor)
@@ -266,12 +277,14 @@ public abstract class Stmt
     }
     public class DrawLine : Stmt
     {
+        public Token name;
         public Expr dirX;
         public Expr dirY;
         public Expr distance;
 
-        public DrawLine(Expr dirX, Expr dirY, Expr distance)
+        public DrawLine(Token name , Expr dirX, Expr dirY, Expr distance)
         {
+            this.name = name;
             this.dirX = dirX;
             this.dirY = dirY;
             this.distance = distance;
@@ -283,12 +296,14 @@ public abstract class Stmt
     }
     public class DrawCircle : Stmt
     {
+        public Token name;
         public Expr dirX;
         public Expr dirY;
         public Expr radius;
 
-        public DrawCircle(Expr dirX, Expr dirY, Expr radius)
+        public DrawCircle(Token name , Expr dirX, Expr dirY, Expr radius)
         {
+            this.name = name;
             this.dirX = dirX;
             this.dirY = dirY;
             this.radius = radius;
@@ -301,14 +316,16 @@ public abstract class Stmt
     }
     public class DrawRectangle : Stmt
     {
+        public Token name;
         public Expr dirX;
         public Expr dirY;
         public Expr distance;
         public Expr width;
         public Expr height;
 
-        public DrawRectangle(Expr dirX, Expr dirY, Expr distance, Expr width, Expr height)
+        public DrawRectangle(Token name , Expr dirX, Expr dirY, Expr distance, Expr width, Expr height)
         {
+            this.name = name;
             this.dirX = dirX;
             this.dirY = dirY;
             this.distance = distance;
@@ -323,15 +340,7 @@ public abstract class Stmt
     }
     public class Fill : Stmt
     {
-        public int X;
-        public int Y;
-      
-
-        public Fill(int X, int Y)
-        {
-            this.X = X;
-            this.Y = Y;
-        }
+        public Fill(){}
         public override void Accept(IVisitor visitor)
         {
             visitor.visitFillStmt(this);

@@ -37,17 +37,17 @@ public class Parser
                 if (match([TokenType.ASIGNATION]))
                 {
                     current -= 2;
-                    varDeclaration();
+                    return varDeclaration();
                 }
                 else if (match([TokenType.LEFT_SQUARE]))
                 {
                     current--;
-                    GoToStatement();
+                   return GoToStatement();
                 }
                 else
                 {
                     current--;
-                    labelDeclaration();
+                    return labelDeclaration();
                 }
             }
             return statement();
@@ -96,6 +96,7 @@ public class Parser
     // Instructions
     private Stmt SpawnStatement()
     {
+        Token name = consume(TokenType.SPAWN, "No Spawn statement found");
         consume(TokenType.LEFT_PAREN, "Expect '(' after 'Spawn' Instruction'.");
 
         Expr x = expression();
@@ -106,10 +107,11 @@ public class Parser
 
         consume(TokenType.JUMPLINE, "Expect 'line'.");
 
-        return new Stmt.Spawn(x, y);
+        return new Stmt.Spawn(name , x, y);
     }
     private Stmt ColorStatement()
     {
+       Token name = consume(TokenType.COLOR, "No Color statement found");
         consume(TokenType.LEFT_PAREN, "Expect '(' after 'Color' Instruction'.");
 
         Expr color = expression();
@@ -118,11 +120,12 @@ public class Parser
 
         consume(TokenType.JUMPLINE, "Expect 'line' .");
 
-        return new Stmt.Color(color);
+        return new Stmt.Color(name , color);
     }
 
     private Stmt SizeStatement()
     {
+        Token name = consume(TokenType.SIZE, "No Size statement found");
         consume(TokenType.LEFT_PAREN, "Expect '(' after 'Size' Instruction'.");
 
         Expr k = expression();
@@ -132,10 +135,11 @@ public class Parser
 
         consume(TokenType.JUMPLINE, "Expect 'line'.");
 
-        return new Stmt.Size(k);
+        return new Stmt.Size(name , k);
     }
     private Stmt DrawLineStatement()
     {
+        Token name = consume(TokenType.DRAWLINE, "No DrawLine statement found");
         consume(TokenType.LEFT_PAREN, "Expect '(' after 'DrawLine' Instruction'.");
 
         Expr dirX = expression();
@@ -148,11 +152,12 @@ public class Parser
         
         consume(TokenType.JUMPLINE, "Expect 'line'.");
 
-        return new Stmt.DrawLine(dirX, dirY, distance);
+        return new Stmt.DrawLine(name , dirX, dirY, distance);
     }
 
     private Stmt DrawCircleStatement()
     {
+        Token name = consume(TokenType.DRAWCIRCLE, "No DRAWCIRCLE statement found");
         consume(TokenType.LEFT_PAREN, "Expect '(' after 'DrawCircle' Instruction'.");
 
         Expr dirX = expression();
@@ -165,10 +170,11 @@ public class Parser
         
         consume(TokenType.JUMPLINE, "Expect 'line' .");
 
-        return new Stmt.DrawCircle(dirX, dirY, radius);
+        return new Stmt.DrawCircle(name , dirX, dirY, radius);
     }
     private Stmt DrawRectangleStatement()
     {
+        Token name = consume(TokenType.DRAWRECTANGLE, "No DrawRectangle statement found");
         consume(TokenType.LEFT_PAREN, "Expect '(' after 'DrawCircle' Instruction'.");
 
         Expr dirX = expression();
@@ -185,7 +191,7 @@ public class Parser
         
         consume(TokenType.JUMPLINE, "Expect 'line'.");
 
-        return new Stmt.DrawRectangle(dirX, dirY, distance, width, high);
+        return new Stmt.DrawRectangle(name , dirX, dirY, distance, width, high);
     }
     private Stmt FillStatement()
     {
@@ -193,8 +199,7 @@ public class Parser
         consume(TokenType.RIGHT_PAREN, "Expect ')' after '('.");
         consume(TokenType.JUMPLINE, "Expect 'line'.");
 
-        // Fix with walle.x and walle.y 
-        return new Stmt.Fill(0, 0);
+        return new Stmt.Fill();
     }
 
     // Functions
@@ -225,6 +230,7 @@ public class Parser
     }
     private Expr GetColorCount()
     {
+        Token name = consume(TokenType.GETCOLORCOUNT, "No GetColorCount expression found");
         consume(TokenType.LEFT_PAREN, "Expect '(' after 'GetActualX' function'.");
 
         Expr color = expression();
@@ -240,28 +246,31 @@ public class Parser
         consume(TokenType.RIGHT_PAREN, "Expect ')' after '('.");
         consume(TokenType.JUMPLINE, "Expect 'line'.");
 
-        return new Expr.GetColorCount(color , x1 , y1 , x2 , y2);
+        return new Expr.GetColorCount(name , color , x1 , y1 , x2 , y2);
     }
     private Expr IsBrushSize()
     {
+        Token name = consume(TokenType.ISBRUSHSIZE, "No IsBrushSize expression found");
         consume(TokenType.LEFT_PAREN, "Expect '(' after 'GetActualX' function'.");
         Expr size = expression();
         consume(TokenType.RIGHT_PAREN, "Expect ')' after '('.");
         consume(TokenType.JUMPLINE, "Expect 'line'.");
 
-        return new Expr.IsBrushSize(size);
+        return new Expr.IsBrushSize(name , size);
     }
     private Expr IsBrushColor()
     {
+        Token name = consume(TokenType.ISBRUSHCOLOR, "No IsBrushColor expression found");
         consume(TokenType.LEFT_PAREN, "Expect '(' after 'GetActualX' function'.");
         Expr color = expression();
         consume(TokenType.RIGHT_PAREN, "Expect ')' after '('.");
         consume(TokenType.JUMPLINE, "Expect 'line'.");
 
-        return new Expr.IsBrushColor(color);
+        return new Expr.IsBrushColor(name , color);
     }
     private Expr IsCanvasColor()
     {
+        Token name = consume(TokenType.ISCANVASCOLOR, "No IsCanvasColor expression found");
         consume(TokenType.LEFT_PAREN, "Expect '(' after 'GetActualX' function'.");
 
         Expr color = expression();
@@ -273,7 +282,7 @@ public class Parser
         consume(TokenType.RIGHT_PAREN, "Expect ')' after '('.");
         consume(TokenType.JUMPLINE, "Expect 'line'.");
 
-        return new Expr.IsCanvasColor(color , x , y);
+        return new Expr.IsCanvasColor(name , color , x , y);
     }
     
     
@@ -428,15 +437,15 @@ public class Parser
     }
     private Stmt statement()
     {
-        if (match([TokenType.SPAWN])) return SpawnStatement();
-        if (match([TokenType.COLOR])) return ColorStatement();
-        if (match([TokenType.DRAWLINE])) return DrawLineStatement();
-        if (match([TokenType.DRAWCIRCLE])) return DrawCircleStatement();
-        if (match([TokenType.DRAWRECTANGLE])) return DrawRectangleStatement();
-        if (match([TokenType.SIZE])) return SizeStatement();
-        if (match([TokenType.FILL])) return FillStatement();
+        if (match([TokenType.SPAWN])) { current--; return SpawnStatement(); }
+        if (match([TokenType.COLOR])) { current--; return ColorStatement(); }
+        if (match([TokenType.DRAWLINE])) { current--; return DrawLineStatement(); }
+        if (match([TokenType.DRAWCIRCLE])) { current--; return DrawCircleStatement(); }
+        if (match([TokenType.DRAWRECTANGLE])) { current--; return DrawRectangleStatement(); }
+        if (match([TokenType.SIZE])) { current--; return SizeStatement(); }
+        if (match([TokenType.FILL])) { current--; return FillStatement(); }
         else
-        return expressionStatement();
+            return expressionStatement();
 
     }
     private Stmt expressionStatement()

@@ -10,7 +10,6 @@ public class RuntimeError : Exception
     {
         this.token = token;
     }
-    public RuntimeError(string message) : base(message){ MainWindow.SetStatus(message, true); }
     public string getMessage()
     {
         return Message;

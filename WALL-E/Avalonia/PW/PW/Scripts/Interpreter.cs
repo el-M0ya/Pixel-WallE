@@ -22,7 +22,7 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
                 {
                     return (string)left + (string)right;
                 }
-                throw new RuntimeError("Operands must be two numbers or two strings.");
+                throw new RuntimeError(expr.operat , "Operands must be two numbers or two strings.");
 
             case TokenType.MINUS:
                 checkNumberOperands(expr.operat, left, right);
@@ -30,7 +30,7 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
 
             case TokenType.SLASH:
                 checkNumberOperands(expr.operat, left, right);
-                if ((int)right == 0) throw new RuntimeError("Division by 0 is not defined");
+                if ((int)right == 0) throw new RuntimeError(expr.operat , "Division by 0 is not defined");
                 return (int)left / (int)right;
 
             case TokenType.STAR:
@@ -116,35 +116,36 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
     }
     public object visitGetColorCount(Expr.GetColorCount expr)
     {
-        checkString(expr.color, "GetColorCount.color");
-        checkNumber(expr.x1, "GetColorCount.x1");
-        checkNumber(expr.y1, "GetColorCount.y1");
-        checkNumber(expr.x2, "GetColorCount.x2");
-        checkNumber(expr.y2, "GetColorCount.y2");
-        return MainWindow.GetColorCount(   stringify(evaluate(expr.color)),
-                                        (int)evaluate(expr.x1) ,(int)evaluate( expr.y1),
-                                        (int)evaluate(expr.x2) , (int)evaluate(expr.y2));
+        checkString(expr.name , expr.color, "GetColorCount.color");
+        checkNumber(expr.name ,expr.x1, "GetColorCount.x1");
+        checkNumber(expr.name ,expr.y1, "GetColorCount.y1");
+        checkNumber(expr.name ,expr.x2, "GetColorCount.x2");
+        checkNumber(expr.name ,expr.y2, "GetColorCount.y2");
+        return MainWindow.GetColorCount(stringify(evaluate(expr.color)),
+                                        (int)evaluate(expr.x1), (int)evaluate(expr.y1),
+                                        (int)evaluate(expr.x2), (int)evaluate(expr.y2));
     }
     public object visitIsBrushSize(Expr.IsBrushSize expr)
     {
-        checkNumber(expr.size, "IsBrushSize.size");
+        checkNumber(expr.name ,expr.size, "IsBrushSize.size");
         return MainWindow.IsBrushSize((int)evaluate(expr.size));
     }
     public object visitIsBrushColor(Expr.IsBrushColor expr)
     {
-        checkString(expr.color, "IsBrushColor.color");
+        checkString(expr.name ,expr.color, "IsBrushColor.color");
         return MainWindow.IsBrushColor(stringify(evaluate(expr.color)));
     }
     public object visitIsCanvasColor(Expr.IsCanvasColor expr)
     {
 
-        checkString(expr.color, "IsCanvasColor.color");
-        checkNumber(expr.x, "IsCanvasColor.x");
-        checkNumber(expr.y, "IsCanvasColor.y");
+        checkString(expr.name ,expr.color, "IsCanvasColor.color");
+        checkNumber(expr.name ,expr.x, "IsCanvasColor.x");
+        checkNumber(expr.name ,expr.y, "IsCanvasColor.y");
 
         return MainWindow.IsCanvasColor(stringify(evaluate(expr.color)),
                                         (int)evaluate(expr.x), (int)evaluate(expr.y));
     }
+
 
     public void visitExprStmt(Stmt.Expression stmt)
     {
@@ -153,55 +154,88 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
 
     public void visitSpawnStmt(Stmt.Spawn spawn)
     {
-        checkNumber(spawn.x, "Spawn.x");
-        checkNumber(spawn.y, "Spawn.y");
+        if (Wall_E.Instance.isSpawn)
+        {
+            throw new RuntimeError(spawn.name , "Mas de un Spawn");
+        }
+        checkNumber(spawn.name ,spawn.x, "Spawn.x");
+        checkNumber(spawn.name ,spawn.y, "Spawn.y");
         int x = (int)evaluate(spawn.x);
         int y = (int)evaluate(spawn.y);
+        Wall_E.Instance.isSpawn = true;
         MainWindow.Spawn(x, y);
-        MainWindow.SetStatus("atudddd", true);
     }
     public void visitColorStmt(Stmt.Color color)
     {
-        checkString(color.color , "Color");
+        checkString(color.name, color.color, "Color");
         string newcolor = stringify(color);
-        MainWindow.Color(newcolor);
+        if (MainWindow._colorNameMap.ContainsKey(newcolor)) MainWindow.Color(newcolor);
+        else
+            throw new RuntimeError(color.name, $"Invalid color: {newcolor}");
     }
     public void visitSizeStmt(Stmt.Size size)
     {
-        checkNumber(size.size, "Size.size");
+        checkNumber(size.name , size.size, "Size.size");
         int newsize = (int)evaluate(size.size);
         MainWindow.Size(newsize);
     }
     public void visitDrawLineStmt(Stmt.DrawLine drawLine)
     {
-        checkNumber(drawLine.dirX, "DrawLine.dirX");
-        checkNumber(drawLine.dirY, "DrawLine.dirY");
-        checkNumber(drawLine.distance, "DrawLine.distance");
+        checkNumber(drawLine.name ,drawLine.dirX, "DrawLine.dirX");
+        checkNumber(drawLine.name ,drawLine.dirY, "DrawLine.dirY");
+        checkNumber(drawLine.name ,drawLine.distance, "DrawLine.distance");
         int x = (int)evaluate(drawLine.dirX);
         int y = (int)evaluate(drawLine.dirY);
+        if (x < -1 || x > 1 || y < -1 || y > 1) throw new RuntimeError(drawLine.name , "Parameters out of range: directions are between -1 and 1");
         int distance = (int)evaluate(drawLine.distance);
+        if (distance < 0)
+        {
+            x = -x;
+            y = -y;
+            distance = -distance;
+        }
         MainWindow.DrawLine(x , y , distance);
     }
     public void visitDrawCircleStmt(Stmt.DrawCircle drawCircle)
     {
+        checkNumber(drawCircle.name ,drawCircle.dirX, "DrawCircle.dirX");
+        checkNumber(drawCircle.name ,drawCircle.dirY, "DrawCircle.dirY");
+        checkNumber(drawCircle.name ,drawCircle.radius, "DrawCircle.radius");
         int x = (int)evaluate(drawCircle.dirX);
         int y = (int)evaluate(drawCircle.dirY);
+         if (x < -1 || x > 1 || y < -1 || y > 1) throw new RuntimeError(drawCircle.name , "Parameters out of range: directions are between -1 and 1");
         int radius = (int)evaluate(drawCircle.radius);
-        MainWindow.DrawLine(x , y , radius);
+        if (radius < 0) radius = -radius;
+        MainWindow.DrawCircle(x , y , radius);
     }
     public void visitDrawRectangleStmt(Stmt.DrawRectangle drawRectangle)
     {
+        checkNumber(drawRectangle.name ,drawRectangle.dirX, "DrawRectangle.dirX");
+        checkNumber(drawRectangle.name ,drawRectangle.dirY, "DrawRectangle.dirY");
+        checkNumber(drawRectangle.name ,drawRectangle.distance, "DrawRectangle.distance");
+        checkNumber(drawRectangle.name ,drawRectangle.width, "DrawRectangle.width");
+        checkNumber(drawRectangle.name ,drawRectangle.height, "DrawRectangle.height");
+        
         int x = (int)evaluate(drawRectangle.dirX);
         int y = (int)evaluate(drawRectangle.dirY);
+        if (x < -1 || x > 1 || y < -1 || y > 1) throw new RuntimeError(drawRectangle.name , "Parameters out of range: directions are between -1 and 1");
         int distance = (int)evaluate(drawRectangle.distance);
+        if (distance < 0)
+        {
+            x = -x;
+            y = -y;
+            distance = -distance;
+        }
         int width = (int)evaluate(drawRectangle.width);
+        if (width < 0) width = -width;
         int height = (int)evaluate(drawRectangle.height);
-
+        if (height < 0) height = -height;
+        
         MainWindow.DrawRectangle(x , y , distance , width , height);
     }
     public void visitFillStmt(Stmt.Fill fill)
     {
-        Console.WriteLine("Fill");
+        MainWindow.Fill();
     }
     public void visitGoToStmt(Stmt.GoTo stmt)
     {
@@ -244,15 +278,15 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
 
         return a != b;
     }
-    private  void checkNumber(Expr operand , string where)
+    private  void checkNumber(Token operat , Expr operand , string where)
     {
         if (evaluate(operand) is int) return;
-        throw new RuntimeError($"{where} must be a number.");
+        throw new RuntimeError(operat , $"{where} must be a number.");
     }
-    private  void checkString(object operand , string where)
+    private  void checkString(Token operat , object operand , string where)
     {
         if (operand is string) return;
-        throw new RuntimeError($"{where} must be a string.");
+        throw new RuntimeError(operat , $"{where} must be a string.");
     }
     private void checkNumberOperands(Token operat, object left, object right)
     {
@@ -278,6 +312,7 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
         }
         catch (RuntimeError error)
         {
+            MainWindow.SetStatus(error.Message, true);
             PixelWallE.runtimeError(error);
         }
     }

@@ -11,31 +11,6 @@ public class PixelWallE
     public static bool HadRuntimeError { get; private set; } = false;
 
     public PixelWallE() { }
-   
-    public  void Main(string[] args)
-    {
-        if (args.Length > 1)
-        {
-            Console.WriteLine("Usage: cpw [script]");
-            System.Environment.Exit(64); // Bad Implementation Error
-        }
-        else if (args.Length == 1) LoadFile(args[0]);
-
-        else RunPrompt();
-    }
-    // Interactive Mode
-    private  void RunPrompt()
-    {
-
-        while (true)
-        {
-            Console.Write("--> ");
-            string? line = Console.ReadLine();
-            if (line == null) break;
-            Run(line);
-            HadError = false;
-        }
-    }
     public  void Run(string source)
     {
         HadError = false;
@@ -48,47 +23,7 @@ public class PixelWallE
         if (HadError) return;
         
         interpreter.interpret(statements);
-        MainWindow.SetStatus($"Ejecutando", false); 
     }
-
-    public static void SaveFile(string code, string path)
-    {
-        try
-        {
-            if (!path.EndsWith(".pw", StringComparison.OrdinalIgnoreCase))
-            {
-                path += ".pw";
-            }
-            File.WriteAllText(path, code);
-            System.Console.WriteLine($"Saved file: {path}");
-        }
-        catch (Exception error)
-        {
-
-            Console.WriteLine($"Export Error:{error.Message}");
-        }
-    }
-
-    public static string LoadFile(string path)
-    {
-        try
-        {
-            if (!File.Exists(path))
-            {
-                throw new RuntimeError($"File not found: {path}");
-            }
-            string code = File.ReadAllText(path);
-            return code;
-        }
-        catch (Exception error)
-        {
-
-            MainWindow.SetStatus($"Import Error:{error.Message}" , true);
-            return null;
-        }
-    }
-
-
     public static void Error(int line, string message)
     {
         Report(line, "", message);
