@@ -23,7 +23,7 @@ public class Wall_E
     public int y;
     public string currentColor;
     public int brushSize;
-    public static Wall_E Instance{get; private set;}
+    public static Wall_E Instance { get; private set; }
     public Wall_E(int x, int y, string currentColor, int brushSize)
     {
         if (Instance == null) Instance = this;
@@ -33,10 +33,17 @@ public class Wall_E
         this.currentColor = currentColor;
         this.brushSize = brushSize;
     }
+    public static void Set(int x, int y, string color, int brush)
+    {
+        Instance.x = x;
+        Instance.y = y;
+        Instance.currentColor = color;
+        Instance.brushSize = brush;
+    }
 }
  public partial class MainWindow : Window
     {
-    private bool isWallEImage = true;
+    public static bool isWallEImage = true;
         // Diccionario de colores, ahora accesible para todos
     public static readonly Dictionary<string, Color> _colorNameMap = new(StringComparer.OrdinalIgnoreCase)
         {
@@ -51,10 +58,10 @@ public class Wall_E
         private NumericUpDown _canvasSizeTextBox;
         private TextEditor _codeEditorTextBox;
         private static TextBlock _statusOutputTextBlock;
-        private static PixelCanvasControl _pixelCanvas; // ¡Referencia a nuestro nuevo control!
+        private static PixelCanvasControl _pixelCanvas; 
 
         private PixelWallE interpreter;
-        public Wall_E walle; // Sigue siendo necesario para tu intérprete
+        public Wall_E walle; 
 
         public MainWindow()
         {
@@ -103,10 +110,15 @@ public class Wall_E
             }
         }
         
-        public void DrawLine(int startX, int startY, int dirX, int dirY, int distance)
+        public static void DrawLine(int dirX, int dirY, int distance)
         {
-            int currentX = startX;
-            int currentY = startY;
+            if (dirX < -1 || dirX > 1 || dirY < -1 || dirY > 1)
+        {
+            SetStatus("Parameters out of range: directions are between -1 and 1", true);
+            return;
+        }
+            int currentX = Wall_E.Instance.x;
+            int currentY = Wall_E.Instance.y;
             
             // CORRECCIÓN LÓGICA IMPORTANTE: El bucle debe ir de 0 a distance-1
             for (int i = 0; i < distance; i++)
@@ -118,11 +130,6 @@ public class Wall_E
             // La nueva posición de Wall-E debería ser (currentX, currentY)
              MoveWalle(currentX, currentY); 
         }
-
-
-
-
-
    
     public static void PaintInWallE()
     {
@@ -150,22 +157,24 @@ public class Wall_E
 
         private void ExecuteButton_Click(object? sender, RoutedEventArgs e)
         {
+        
             if (string.IsNullOrWhiteSpace(_codeEditorTextBox.Text))
-            {
-                SetStatus("No hay código para ejecutar.", true);
-                return;
-            }
+        {
+            SetStatus("No hay código para ejecutar.", true);
+            return;
+        }
+        _pixelCanvas.Clear();
+        Wall_E.Set(-1, -1, "Red", 1);
             
             SetStatus("Ejecutando código...", false);
 
-           
+        interpreter = new PixelWallE();
             interpreter.Run(_codeEditorTextBox.Text);
             // Después de que el intérprete termine, refresca el canvas UNA VEZ.
             _pixelCanvas.Refresh();
 
-            SetStatus("Ejecución completada.", false);
         }
-    private async void LoadScriptButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private async void LoadScriptButton_Click(object? sender, RoutedEventArgs e)
     {
         var openDialog = new OpenFileDialog
         {
@@ -261,22 +270,7 @@ public class Wall_E
     {
         Wall_E.Instance.brushSize = size;
     }
-    public static void DrawLine(int dirx, int diry, int distance)
-    {
-        if (dirx < -1 || dirx > 1 || diry < -1 || diry > 1)
-        {
-            SetStatus("Parameters out of range: directions are between -1 and 1", true);
-            return;
-        }
-        if (distance < 0) DrawLine(-dirx, -diry, -distance);
-
-        for (int i = 0; i < distance; i++)
-        {
-            MoveWalle(dirx, diry);
-            PaintInWallE();
-            distance--;
-        }
-    }
+    
     public static void DrawCircle(int dirx, int diry, int r)
     {
         //MoveWalle(walle.x + r*dirx , walle.y + r*diry );

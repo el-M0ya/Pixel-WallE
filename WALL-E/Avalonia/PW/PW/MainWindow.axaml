@@ -21,13 +21,13 @@
             <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" Margin="5">
                 <Button Name="_SaveScriptButton" Content="Save" Margin="2" Width="60"/>
                 <Button Margin="2" Width="60" Height="60" Click="_ChangeImg">
-                    <Image Source="C:\000mio\Universidad\Programacion\Avalonia Pojects\WALL-E\Avalonia\PW\PW\Assets\EVA.png" Stretch="Uniform" />
+                    <Image Source="C:\000mio\Universidad\Programacion\Avalonia Pojects\WALL-E\Avalonia\PW\PW\Assets\WALL-E.png" Stretch="Uniform" />
                 </Button>
                 <Button Name="_LoadScriptButton" Content="Load" Margin="2" Width="60"/>
             </StackPanel>
 
             <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="5">
-                <NumericUpDown x:Name="_CanvasSizeTextBox" Minimum="8" Maximum="512" Value="32" Width="120" Margin="2" FormatString="0"/>
+                <NumericUpDown x:Name="_CanvasSizeTextBox" Minimum="8" Maximum="128" Value="32" Width="120" Margin="2" FormatString="0"/>
                 <Button Content="Apply" Name="_ResizeCanvasButton" Margin="2" Width="60"/>
             </StackPanel>
 

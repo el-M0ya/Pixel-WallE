@@ -2,7 +2,10 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
+using Avalonia.Platform;
 using System;
+using System.Threading.Tasks;
 
 namespace PW
 {
@@ -10,7 +13,7 @@ namespace PW
     {
         // Almacena el estado de cada píxel
         public Color[,] _pixelData;
-        
+
         // Dimensiones del canvas en píxeles
         public int CanvasDimension { get; private set; } = 32;
 
@@ -35,6 +38,7 @@ namespace PW
             CanvasDimension = dimension;
             _pixelData = new Color[dimension, dimension];
             Clear(); // Limpia al nuevo tamaño
+            // Wall_E.Set(-1, -1, "Transparent", 1);
         }
 
         /// <summary>
@@ -44,8 +48,8 @@ namespace PW
         {
             if (x < 0 || x >= CanvasDimension || y < 0 || y >= CanvasDimension)
             {
-                // El intérprete debería manejar esto como un error en tiempo de ejecución.
-                return; 
+                MainWindow.SetStatus("Out of range", true);
+                return;
             }
             _pixelData[x, y] = color;
         }
@@ -76,7 +80,7 @@ namespace PW
             }
             Refresh(); // Pide un redibujado para mostrar el canvas limpio
         }
-        
+
         /// <summary>
         /// Le dice a Avalonia que este control necesita ser redibujado.
         /// ¡LLAMA A ESTE MÉTODO DESPUÉS DE UN COMANDO DE DIBUJO COMPLETO!
@@ -95,6 +99,8 @@ namespace PW
         {
             base.Render(context);
             if (_pixelData == null) return;
+
+
 
             // Calcula el tamaño de cada "píxel" en la pantalla
             double cellWidth = this.Bounds.Width / CanvasDimension;
@@ -129,6 +135,19 @@ namespace PW
                 var p2 = new Point(this.Bounds.Width, i * cellHeight);
                 context.DrawLine(_gridPen, p1, p2);
             }
+            int wallex = Wall_E.Instance.x;
+            int walley = Wall_E.Instance.y;
+            if (wallex < 0 || wallex > CanvasDimension || walley < 0 || walley > CanvasDimension) return;
+
+            var image = new Bitmap(!MainWindow.isWallEImage
+            ? "C:/000mio/Universidad/Programacion/Avalonia Pojects/WALL-E/Avalonia/PW/PW/Assets/EVA.png"
+            : "C:/000mio/Universidad/Programacion/Avalonia Pojects/WALL-E/Avalonia/PW/PW/Assets/WALL-E.png");
+
+            Rect destRect = new Rect(wallex * cellWidth, walley * cellHeight, cellWidth, cellHeight);
+            context.DrawImage(image, destRect);
         }
-    }
+
+
+    
+    }   
 }
