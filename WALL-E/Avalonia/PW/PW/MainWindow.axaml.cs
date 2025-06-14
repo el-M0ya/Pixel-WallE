@@ -123,10 +123,15 @@ public class Wall_E
 
 
    
-    public static void PaintInWallE()
+    public static void Paint()
     {
         Paint(Wall_E.Instance.x, Wall_E.Instance.y, Wall_E.Instance.currentColor, Wall_E.Instance.brushSize);
     }
+    public static void Paint(int x , int y)
+    {
+        Paint(x, y, Wall_E.Instance.currentColor, Wall_E.Instance.brushSize);
+    }
+
 
     public static Color GetPixelColorFromCanvas(int x, int y)
     {
@@ -284,14 +289,60 @@ public class Wall_E
             MoveWalle(currentX, currentY);
         }
     }
-    
-    public static void DrawCircle(int dirx, int diry, int r)
+
+    // 1. Algoritmo del Punto Medio (Midpoint)
+    public static void DrawCircle(int dirX, int dirY, int radius)
     {
+        
+    
+        if (dirX == 0 && dirY == 0) DrawCircle(radius);
+        else
+        {
+            MoveWalle(Wall_E.Instance.x + dirX * radius, Wall_E.Instance.y + dirY * radius);
+            DrawCircle(radius);
+        }
+         }
+    public static void DrawCircle(int radius)
+    {
+        if (radius <= 0)
+        {
+            Paint(Wall_E.Instance.x , Wall_E.Instance.y);
+            return;
+        }
+        int xc = Wall_E.Instance.x;
+        int yc = Wall_E.Instance.y;
+        int x = 0;
+        int y = radius;
+        int d = 1 - radius;
 
+        PaintCirclePoints(xc, yc, x, y);
 
+        while (x < y)
+        {
+            x++;
+            if (d < 0)
+            {
+                d += 2 * x + 1;
+            }
+            else
+            {
+                y--;
+                d += 2 * (x - y) + 1;
+            }
+            PaintCirclePoints(xc, yc, x, y);
+        }
+    }
 
-
-
+    private static void PaintCirclePoints(int xc, int yc, int x, int y)
+    {
+        Paint(xc + x, yc + y);
+        Paint(xc - x, yc + y);
+        Paint(xc + x, yc - y);
+        Paint(xc - x, yc - y);
+        Paint(xc + y, yc + x);
+        Paint(xc - y, yc + x);
+        Paint(xc + y, yc - x);
+        Paint(xc - y, yc - x);
     }
     public static void DrawRectangle(int dirx, int diry, int distance, int width, int height)
     {

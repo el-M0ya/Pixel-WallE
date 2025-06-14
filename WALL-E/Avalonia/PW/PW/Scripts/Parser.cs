@@ -39,6 +39,7 @@ public class Parser
     // };
      private Stmt statement()
     {
+        if (match([TokenType.GOTO])) {return GoToStatement(); }
         if (match([TokenType.SPAWN])) { current--; return SpawnStatement(); }
         if (match([TokenType.COLOR])) { current--; return ColorStatement(); }
         if (match([TokenType.DRAWLINE])) { current--; return DrawLineStatement(); }
@@ -95,11 +96,6 @@ public class Parser
                     current -= 2;
                     return varDeclaration();
                 }
-                else if (match([TokenType.LEFT_SQUARE]))
-                {
-                    current--;
-                    return GoToStatement();
-                }
                 else
                 {
                     current--;
@@ -110,7 +106,6 @@ public class Parser
         }
         catch (ParseError error)
         {
-            MainWindow.SetStatus(error.Message, true);
             synchronize();
             return null;
         }
@@ -132,7 +127,6 @@ public class Parser
         Token label = consume(TokenType.IDENTIFIER, "Expect variable name.");
         consume(TokenType.JUMPLINE, "Expect 'line' after label declaration.");
         return new Stmt.Label(label);
-
     }
 
      private  Stmt GoToStatement()

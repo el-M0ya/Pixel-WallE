@@ -266,7 +266,7 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
     {
         if (obj == null) return false;
         if (obj is bool) return (bool)obj;
-        return true;
+        return false;
     }
     private static bool isEqual(object a, object b)
     {
