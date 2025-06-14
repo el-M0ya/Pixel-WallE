@@ -355,6 +355,21 @@
           }
         }
       },
+      "AvaloniaEdit.TextMate/11.3.0": {
+        "type": "package",
+        "dependencies": {
+          "Avalonia": "11.0.0",
+          "Avalonia.AvaloniaEdit": "11.3.0",
+          "TextMateSharp": "1.0.65",
+          "TextMateSharp.Grammars": "1.0.65"
+        },
+        "compile": {
+          "lib/net6.0/AvaloniaEdit.TextMate.dll": {}
+        },
+        "runtime": {
+          "lib/net6.0/AvaloniaEdit.TextMate.dll": {}
+        }
+      },
       "HarfBuzzSharp/8.3.1.1": {
         "type": "package",
         "dependencies": {
@@ -485,6 +500,53 @@
         },
         "runtime": {
           "lib/net5.0/MicroCom.Runtime.dll": {}
+        }
+      },
+      "Onigwrap/1.0.6": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.0/Onigwrap.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/Onigwrap.dll": {}
+        },
+        "build": {
+          "buildTransitive/netstandard1.0/Onigwrap.props": {},
+          "buildTransitive/netstandard1.0/Onigwrap.targets": {}
+        },
+        "runtimeTargets": {
+          "runtimes/linux-arm64/native/libonigwrap.so": {
+            "assetType": "native",
+            "rid": "linux-arm64"
+          },
+          "runtimes/linux-musl-arm64/native/libonigwrap.so": {
+            "assetType": "native",
+            "rid": "linux-musl-arm64"
+          },
+          "runtimes/linux-musl-x64/native/libonigwrap.so": {
+            "assetType": "native",
+            "rid": "linux-musl-x64"
+          },
+          "runtimes/linux-x64/native/libonigwrap.so": {
+            "assetType": "native",
+            "rid": "linux-x64"
+          },
+          "runtimes/osx/native/libonigwrap.dylib": {
+            "assetType": "native",
+            "rid": "osx"
+          },
+          "runtimes/win-arm64/native/libonigwrap.dll": {
+            "assetType": "native",
+            "rid": "win-arm64"
+          },
+          "runtimes/win-x64/native/libonigwrap.dll": {
+            "assetType": "native",
+            "rid": "win-x64"
+          },
+          "runtimes/win-x86/native/libonigwrap.dll": {
+            "assetType": "native",
+            "rid": "win-x86"
+          }
         }
       },
       "SkiaSharp/3.119.0": {
@@ -622,6 +684,48 @@
         },
         "build": {
           "buildTransitive/net6.0/_._": {}
+        }
+      },
+      "System.Text.Json/8.0.5": {
+        "type": "package",
+        "compile": {
+          "lib/net8.0/System.Text.Json.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/System.Text.Json.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net6.0/System.Text.Json.targets": {}
+        }
+      },
+      "TextMateSharp/1.0.69": {
+        "type": "package",
+        "dependencies": {
+          "Onigwrap": "1.0.6",
+          "System.Text.Json": "8.0.5"
+        },
+        "compile": {
+          "lib/netstandard2.0/TextMateSharp.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/TextMateSharp.dll": {}
+        }
+      },
+      "TextMateSharp.Grammars/1.0.65": {
+        "type": "package",
+        "dependencies": {
+          "System.Text.Json": "8.0.5",
+          "TextMateSharp": "1.0.65"
+        },
+        "compile": {
+          "lib/netstandard2.0/TextMateSharp.Grammars.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/TextMateSharp.Grammars.dll": {}
         }
       },
       "Tmds.DBus.Protocol/0.21.2": {
@@ -1097,6 +1201,20 @@
         "lib/netstandard2.0/Avalonia.X11.xml"
       ]
     },
+    "AvaloniaEdit.TextMate/11.3.0": {
+      "sha512": "9yDE7JUGZxWLo5eqhd6FXMHgj4EH2NOQxL030Vja6SBYX5wiLR8Pk67A8DtIabb0tpvEEDPWBBasN70OhjUiwg==",
+      "type": "package",
+      "path": "avaloniaedit.textmate/11.3.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "avaloniaedit.textmate.11.3.0.nupkg.sha512",
+        "avaloniaedit.textmate.nuspec",
+        "lib/net6.0/AvaloniaEdit.TextMate.dll",
+        "lib/netstandard2.0/AvaloniaEdit.TextMate.dll"
+      ]
+    },
     "HarfBuzzSharp/8.3.1.1": {
       "sha512": "tLZN66oe/uiRPTZfrCU4i8ScVGwqHNh5MHrXj0yVf4l7Mz0FhTGnQ71RGySROTmdognAs0JtluHkL41pIabWuQ==",
       "type": "package",
@@ -1266,6 +1384,35 @@
         "lib/netstandard2.0/MicroCom.Runtime.dll",
         "microcom.runtime.0.11.0.nupkg.sha512",
         "microcom.runtime.nuspec"
+      ]
+    },
+    "Onigwrap/1.0.6": {
+      "sha512": "nqmemnwPFmcLPINSEUsbj/jdZ+vhaRMG3E7G/4yGwFEzWusfCgucutMsIKxRXLo0buon35uZeXadnnT6r8fuqQ==",
+      "type": "package",
+      "path": "onigwrap/1.0.6",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "THIRD-PARTY-NOTICES.TXT",
+        "buildTransitive/netstandard1.0/Onigwrap.props",
+        "buildTransitive/netstandard1.0/Onigwrap.targets",
+        "buildTransitive/netstandard1.0/wasm/2.0.23/st/libonigwrap.a",
+        "buildTransitive/netstandard1.0/wasm/3.1.12/mt/libonigwrap.a",
+        "buildTransitive/netstandard1.0/wasm/3.1.12/st/libonigwrap.a",
+        "buildTransitive/netstandard1.0/wasm/3.1.34/mt/libonigwrap.a",
+        "buildTransitive/netstandard1.0/wasm/3.1.34/st/libonigwrap.a",
+        "lib/netstandard2.0/Onigwrap.dll",
+        "onigwrap.1.0.6.nupkg.sha512",
+        "onigwrap.nuspec",
+        "runtimes/linux-arm64/native/libonigwrap.so",
+        "runtimes/linux-musl-arm64/native/libonigwrap.so",
+        "runtimes/linux-musl-x64/native/libonigwrap.so",
+        "runtimes/linux-x64/native/libonigwrap.so",
+        "runtimes/osx/native/libonigwrap.dylib",
+        "runtimes/win-arm64/native/libonigwrap.dll",
+        "runtimes/win-x64/native/libonigwrap.dll",
+        "runtimes/win-x86/native/libonigwrap.dll"
       ]
     },
     "SkiaSharp/3.119.0": {
@@ -1467,6 +1614,103 @@
         "useSharedDesignerContext.txt"
       ]
     },
+    "System.Text.Json/8.0.5": {
+      "sha512": "0f1B50Ss7rqxXiaBJyzUu9bWFOO2/zSlifZ/UNMdiIpDYe4cY4LQQicP4nirK1OS31I43rn062UIJ1Q9bpmHpg==",
+      "type": "package",
+      "path": "system.text.json/8.0.5",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "LICENSE.TXT",
+        "PACKAGE.md",
+        "THIRD-PARTY-NOTICES.TXT",
+        "analyzers/dotnet/roslyn3.11/cs/System.Text.Json.SourceGeneration.dll",
+        "analyzers/dotnet/roslyn3.11/cs/cs/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn3.11/cs/de/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn3.11/cs/es/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn3.11/cs/fr/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn3.11/cs/it/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn3.11/cs/ja/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn3.11/cs/ko/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn3.11/cs/pl/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn3.11/cs/pt-BR/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn3.11/cs/ru/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn3.11/cs/tr/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn3.11/cs/zh-Hans/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn3.11/cs/zh-Hant/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.0/cs/System.Text.Json.SourceGeneration.dll",
+        "analyzers/dotnet/roslyn4.0/cs/cs/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.0/cs/de/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.0/cs/es/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.0/cs/fr/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.0/cs/it/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.0/cs/ja/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.0/cs/ko/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.0/cs/pl/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.0/cs/pt-BR/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.0/cs/ru/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.0/cs/tr/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.0/cs/zh-Hans/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.0/cs/zh-Hant/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.4/cs/System.Text.Json.SourceGeneration.dll",
+        "analyzers/dotnet/roslyn4.4/cs/cs/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.4/cs/de/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.4/cs/es/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.4/cs/fr/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.4/cs/it/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.4/cs/ja/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.4/cs/ko/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.4/cs/pl/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.4/cs/pt-BR/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.4/cs/ru/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.4/cs/tr/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.4/cs/zh-Hans/System.Text.Json.SourceGeneration.resources.dll",
+        "analyzers/dotnet/roslyn4.4/cs/zh-Hant/System.Text.Json.SourceGeneration.resources.dll",
+        "buildTransitive/net461/System.Text.Json.targets",
+        "buildTransitive/net462/System.Text.Json.targets",
+        "buildTransitive/net6.0/System.Text.Json.targets",
+        "buildTransitive/netcoreapp2.0/System.Text.Json.targets",
+        "buildTransitive/netstandard2.0/System.Text.Json.targets",
+        "lib/net462/System.Text.Json.dll",
+        "lib/net462/System.Text.Json.xml",
+        "lib/net6.0/System.Text.Json.dll",
+        "lib/net6.0/System.Text.Json.xml",
+        "lib/net7.0/System.Text.Json.dll",
+        "lib/net7.0/System.Text.Json.xml",
+        "lib/net8.0/System.Text.Json.dll",
+        "lib/net8.0/System.Text.Json.xml",
+        "lib/netstandard2.0/System.Text.Json.dll",
+        "lib/netstandard2.0/System.Text.Json.xml",
+        "system.text.json.8.0.5.nupkg.sha512",
+        "system.text.json.nuspec",
+        "useSharedDesignerContext.txt"
+      ]
+    },
+    "TextMateSharp/1.0.69": {
+      "sha512": "9m2bSSIognbvtfEl6BF+uBLZZvtYdsMdkhGrjHrEBf6CgFtBKSt68hSlGR1zfPplVA8j1SaGsDqPrExgznfQvg==",
+      "type": "package",
+      "path": "textmatesharp/1.0.69",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/netstandard2.0/TextMateSharp.dll",
+        "textmatesharp.1.0.69.nupkg.sha512",
+        "textmatesharp.nuspec"
+      ]
+    },
+    "TextMateSharp.Grammars/1.0.65": {
+      "sha512": "ga+Uz5iyb75nuQY9hmALiWdeMkFZknJKrIvVDCrI3iZ0Ff9+tk0CqRKr0/KVR/Gg7MEY21cCtMYUbkBVczdwBA==",
+      "type": "package",
+      "path": "textmatesharp.grammars/1.0.65",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/netstandard2.0/TextMateSharp.Grammars.dll",
+        "textmatesharp.grammars.1.0.65.nupkg.sha512",
+        "textmatesharp.grammars.nuspec"
+      ]
+    },
     "Tmds.DBus.Protocol/0.21.2": {
       "sha512": "ScSMrUrrw8px4kK1Glh0fZv/HQUlg1078bNXNPfRPKQ3WbRzV9HpsydYEOgSoMK5LWICMf2bMwIFH0pGjxjcMA==",
       "type": "package",
@@ -1492,8 +1736,10 @@
       "Avalonia.Fonts.Inter >= 11.2.6",
       "Avalonia.Skia >= 11.3.1",
       "Avalonia.Themes.Fluent >= 11.2.6",
+      "AvaloniaEdit.TextMate >= 11.3.0",
       "SkiaSharp >= 3.119.0",
-      "SkiaSharp.NativeAssets.Linux >= 3.119.0"
+      "SkiaSharp.NativeAssets.Linux >= 3.119.0",
+      "TextMateSharp >= 1.0.69"
     ]
   },
   "packageFolders": {
@@ -1567,6 +1813,10 @@
             "target": "Package",
             "version": "[11.2.6, )"
           },
+          "AvaloniaEdit.TextMate": {
+            "target": "Package",
+            "version": "[11.3.0, )"
+          },
           "SkiaSharp": {
             "target": "Package",
             "version": "[3.119.0, )"
@@ -1574,6 +1824,10 @@
           "SkiaSharp.NativeAssets.Linux": {
             "target": "Package",
             "version": "[3.119.0, )"
+          },
+          "TextMateSharp": {
+            "target": "Package",
+            "version": "[1.0.69, )"
           }
         },
         "imports": [

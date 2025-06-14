@@ -81,3 +81,15 @@ C:\000mio\Universidad\Programacion\Avalonia Pojects\WALL-E\Avalonia\PW\PW\bin\De
 C:\000mio\Universidad\Programacion\Avalonia Pojects\WALL-E\Avalonia\PW\PW\obj\Debug\net9.0\PW.dll
 C:\000mio\Universidad\Programacion\Avalonia Pojects\WALL-E\Avalonia\PW\PW\obj\Debug\net9.0\refint\PW.dll
 C:\000mio\Universidad\Programacion\Avalonia Pojects\WALL-E\Avalonia\PW\PW\obj\Debug\net9.0\PW.pdb
+C:\000mio\Universidad\Programacion\Avalonia Pojects\WALL-E\Avalonia\PW\PW\bin\Debug\net9.0\AvaloniaEdit.TextMate.dll
+C:\000mio\Universidad\Programacion\Avalonia Pojects\WALL-E\Avalonia\PW\PW\bin\Debug\net9.0\Onigwrap.dll
+C:\000mio\Universidad\Programacion\Avalonia Pojects\WALL-E\Avalonia\PW\PW\bin\Debug\net9.0\TextMateSharp.dll
+C:\000mio\Universidad\Programacion\Avalonia Pojects\WALL-E\Avalonia\PW\PW\bin\Debug\net9.0\TextMateSharp.Grammars.dll
+C:\000mio\Universidad\Programacion\Avalonia Pojects\WALL-E\Avalonia\PW\PW\bin\Debug\net9.0\runtimes\linux-arm64\native\libonigwrap.so
+C:\000mio\Universidad\Programacion\Avalonia Pojects\WALL-E\Avalonia\PW\PW\bin\Debug\net9.0\runtimes\linux-musl-arm64\native\libonigwrap.so
+C:\000mio\Universidad\Programacion\Avalonia Pojects\WALL-E\Avalonia\PW\PW\bin\Debug\net9.0\runtimes\linux-musl-x64\native\libonigwrap.so
+C:\000mio\Universidad\Programacion\Avalonia Pojects\WALL-E\Avalonia\PW\PW\bin\Debug\net9.0\runtimes\linux-x64\native\libonigwrap.so
+C:\000mio\Universidad\Programacion\Avalonia Pojects\WALL-E\Avalonia\PW\PW\bin\Debug\net9.0\runtimes\osx\native\libonigwrap.dylib
+C:\000mio\Universidad\Programacion\Avalonia Pojects\WALL-E\Avalonia\PW\PW\bin\Debug\net9.0\runtimes\win-arm64\native\libonigwrap.dll
+C:\000mio\Universidad\Programacion\Avalonia Pojects\WALL-E\Avalonia\PW\PW\bin\Debug\net9.0\runtimes\win-x64\native\libonigwrap.dll
+C:\000mio\Universidad\Programacion\Avalonia Pojects\WALL-E\Avalonia\PW\PW\bin\Debug\net9.0\runtimes\win-x86\native\libonigwrap.dll

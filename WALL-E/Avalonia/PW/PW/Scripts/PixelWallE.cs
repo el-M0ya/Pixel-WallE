@@ -6,12 +6,12 @@ using System.IO;
 
 public class PixelWallE
 {
-    private static  Interpreter interpreter = new Interpreter();
+    private static Interpreter interpreter = new Interpreter();
     public static bool HadError { get; private set; } = false;
     public static bool HadRuntimeError { get; private set; } = false;
 
     public PixelWallE() { }
-    public  void Run(string source)
+    public void Run(string source)
     {
         HadError = false;
         Scanner scanner = new Scanner(source);
@@ -21,7 +21,7 @@ public class PixelWallE
         List<Stmt> statements = parser.parse();
         // Stop if there was a syntax error.
         if (HadError) return;
-        
+
         interpreter.interpret(statements);
     }
     public static void Error(int line, string message)
@@ -41,12 +41,12 @@ public class PixelWallE
     }
     private static void Report(int line, string where, string message)
     {
-        MainWindow.SetStatus("[line " + line + "] Error" + where + ": " + message , true);
+        MainWindow.SetStatus("[line " + line + "] Error" + where + ": " + message, true);
         HadError = true;
     }
     public static void runtimeError(RuntimeError error)
     {
-        MainWindow.SetStatus(error.getMessage()   +  "\n[line " + error.token.line + "]" , true);
+        MainWindow.SetStatus(error.getMessage() + "\n[line " + error.token.line + "]", true);
         HadRuntimeError = true;
     }
 }

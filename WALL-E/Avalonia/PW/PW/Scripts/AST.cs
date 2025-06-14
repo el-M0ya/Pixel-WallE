@@ -340,7 +340,9 @@ public abstract class Stmt
     }
     public class Fill : Stmt
     {
-        public Fill(){}
+        public Token name;
+        public Fill(Token name) => this.name = name;
+        
         public override void Accept(IVisitor visitor)
         {
             visitor.visitFillStmt(this);

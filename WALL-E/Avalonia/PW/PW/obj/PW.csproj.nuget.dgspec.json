@@ -72,6 +72,10 @@
               "target": "Package",
               "version": "[11.2.6, )"
             },
+            "AvaloniaEdit.TextMate": {
+              "target": "Package",
+              "version": "[11.3.0, )"
+            },
             "SkiaSharp": {
               "target": "Package",
               "version": "[3.119.0, )"
@@ -79,6 +83,10 @@
             "SkiaSharp.NativeAssets.Linux": {
               "target": "Package",
               "version": "[3.119.0, )"
+            },
+            "TextMateSharp": {
+              "target": "Package",
+              "version": "[1.0.69, )"
             }
           },
           "imports": [

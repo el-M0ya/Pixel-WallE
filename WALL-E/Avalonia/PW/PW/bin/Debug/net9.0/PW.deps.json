@@ -15,8 +15,10 @@
           "Avalonia.Fonts.Inter": "11.2.6",
           "Avalonia.Skia": "11.3.1",
           "Avalonia.Themes.Fluent": "11.2.6",
+          "AvaloniaEdit.TextMate": "11.3.0",
           "SkiaSharp": "3.119.0",
-          "SkiaSharp.NativeAssets.Linux": "3.119.0"
+          "SkiaSharp.NativeAssets.Linux": "3.119.0",
+          "TextMateSharp": "1.0.69"
         },
         "runtime": {
           "PW.dll": {}
@@ -276,6 +278,20 @@
           }
         }
       },
+      "AvaloniaEdit.TextMate/11.3.0": {
+        "dependencies": {
+          "Avalonia": "11.3.1",
+          "Avalonia.AvaloniaEdit": "11.3.0",
+          "TextMateSharp": "1.0.69",
+          "TextMateSharp.Grammars": "1.0.65"
+        },
+        "runtime": {
+          "lib/net6.0/AvaloniaEdit.TextMate.dll": {
+            "assemblyVersion": "11.3.0.0",
+            "fileVersion": "11.3.0.0"
+          }
+        }
+      },
       "HarfBuzzSharp/8.3.1.1": {
         "dependencies": {
           "HarfBuzzSharp.NativeAssets.Win32": "8.3.1.1",
@@ -384,6 +400,56 @@
           }
         }
       },
+      "Onigwrap/1.0.6": {
+        "runtime": {
+          "lib/netstandard2.0/Onigwrap.dll": {
+            "assemblyVersion": "1.0.6.0",
+            "fileVersion": "1.0.6.0"
+          }
+        },
+        "runtimeTargets": {
+          "runtimes/linux-arm64/native/libonigwrap.so": {
+            "rid": "linux-arm64",
+            "assetType": "native",
+            "fileVersion": "0.0.0.0"
+          },
+          "runtimes/linux-musl-arm64/native/libonigwrap.so": {
+            "rid": "linux-musl-arm64",
+            "assetType": "native",
+            "fileVersion": "0.0.0.0"
+          },
+          "runtimes/linux-musl-x64/native/libonigwrap.so": {
+            "rid": "linux-musl-x64",
+            "assetType": "native",
+            "fileVersion": "0.0.0.0"
+          },
+          "runtimes/linux-x64/native/libonigwrap.so": {
+            "rid": "linux-x64",
+            "assetType": "native",
+            "fileVersion": "0.0.0.0"
+          },
+          "runtimes/osx/native/libonigwrap.dylib": {
+            "rid": "osx",
+            "assetType": "native",
+            "fileVersion": "0.0.0.0"
+          },
+          "runtimes/win-arm64/native/libonigwrap.dll": {
+            "rid": "win-arm64",
+            "assetType": "native",
+            "fileVersion": "0.0.0.0"
+          },
+          "runtimes/win-x64/native/libonigwrap.dll": {
+            "rid": "win-x64",
+            "assetType": "native",
+            "fileVersion": "0.0.0.0"
+          },
+          "runtimes/win-x86/native/libonigwrap.dll": {
+            "rid": "win-x86",
+            "assetType": "native",
+            "fileVersion": "0.0.0.0"
+          }
+        }
+      },
       "SkiaSharp/3.119.0": {
         "dependencies": {
           "SkiaSharp.NativeAssets.Win32": "3.119.0",
@@ -485,6 +551,31 @@
         }
       },
       "System.IO.Pipelines/8.0.0": {},
+      "System.Text.Json/8.0.5": {},
+      "TextMateSharp/1.0.69": {
+        "dependencies": {
+          "Onigwrap": "1.0.6",
+          "System.Text.Json": "8.0.5"
+        },
+        "runtime": {
+          "lib/netstandard2.0/TextMateSharp.dll": {
+            "assemblyVersion": "1.0.69.0",
+            "fileVersion": "1.0.69.0"
+          }
+        }
+      },
+      "TextMateSharp.Grammars/1.0.65": {
+        "dependencies": {
+          "System.Text.Json": "8.0.5",
+          "TextMateSharp": "1.0.69"
+        },
+        "runtime": {
+          "lib/netstandard2.0/TextMateSharp.Grammars.dll": {
+            "assemblyVersion": "1.0.65.0",
+            "fileVersion": "1.0.65.0"
+          }
+        }
+      },
       "Tmds.DBus.Protocol/0.21.2": {
         "dependencies": {
           "System.IO.Pipelines": "8.0.0"
@@ -623,6 +714,13 @@
       "path": "avalonia.x11/11.3.1",
       "hashPath": "avalonia.x11.11.3.1.nupkg.sha512"
     },
+    "AvaloniaEdit.TextMate/11.3.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-9yDE7JUGZxWLo5eqhd6FXMHgj4EH2NOQxL030Vja6SBYX5wiLR8Pk67A8DtIabb0tpvEEDPWBBasN70OhjUiwg==",
+      "path": "avaloniaedit.textmate/11.3.0",
+      "hashPath": "avaloniaedit.textmate.11.3.0.nupkg.sha512"
+    },
     "HarfBuzzSharp/8.3.1.1": {
       "type": "package",
       "serviceable": true,
@@ -665,6 +763,13 @@
       "path": "microcom.runtime/0.11.0",
       "hashPath": "microcom.runtime.0.11.0.nupkg.sha512"
     },
+    "Onigwrap/1.0.6": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-nqmemnwPFmcLPINSEUsbj/jdZ+vhaRMG3E7G/4yGwFEzWusfCgucutMsIKxRXLo0buon35uZeXadnnT6r8fuqQ==",
+      "path": "onigwrap/1.0.6",
+      "hashPath": "onigwrap.1.0.6.nupkg.sha512"
+    },
     "SkiaSharp/3.119.0": {
       "type": "package",
       "serviceable": true,
@@ -706,6 +811,27 @@
       "sha512": "sha512-FHNOatmUq0sqJOkTx+UF/9YK1f180cnW5FVqnQMvYUN0elp6wFzbtPSiqbo1/ru8ICp43JM1i7kKkk6GsNGHlA==",
       "path": "system.io.pipelines/8.0.0",
       "hashPath": "system.io.pipelines.8.0.0.nupkg.sha512"
+    },
+    "System.Text.Json/8.0.5": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-0f1B50Ss7rqxXiaBJyzUu9bWFOO2/zSlifZ/UNMdiIpDYe4cY4LQQicP4nirK1OS31I43rn062UIJ1Q9bpmHpg==",
+      "path": "system.text.json/8.0.5",
+      "hashPath": "system.text.json.8.0.5.nupkg.sha512"
+    },
+    "TextMateSharp/1.0.69": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-9m2bSSIognbvtfEl6BF+uBLZZvtYdsMdkhGrjHrEBf6CgFtBKSt68hSlGR1zfPplVA8j1SaGsDqPrExgznfQvg==",
+      "path": "textmatesharp/1.0.69",
+      "hashPath": "textmatesharp.1.0.69.nupkg.sha512"
+    },
+    "TextMateSharp.Grammars/1.0.65": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-ga+Uz5iyb75nuQY9hmALiWdeMkFZknJKrIvVDCrI3iZ0Ff9+tk0CqRKr0/KVR/Gg7MEY21cCtMYUbkBVczdwBA==",
+      "path": "textmatesharp.grammars/1.0.65",
+      "hashPath": "textmatesharp.grammars.1.0.65.nupkg.sha512"
     },
     "Tmds.DBus.Protocol/0.21.2": {
       "type": "package",

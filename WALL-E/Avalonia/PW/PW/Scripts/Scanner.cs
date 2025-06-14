@@ -12,7 +12,6 @@ public class Scanner
     private List<Token> tokens = new List<Token>();
     private static Dictionary<string, TokenType>? keywords = new Dictionary<string, TokenType>()
     {
-        { "var", TokenType.VAR},
         { "GoTo", TokenType.GOTO},
         {"Spawn", TokenType.SPAWN},
         {"Color", TokenType.COLOR},

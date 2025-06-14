@@ -12,7 +12,7 @@
     <Grid Background="slategray" ColumnDefinitions="*, 350">
         
         <!-- CANVAS A LA IZQUIERDA -->
-        <Border Grid.Column="0" BorderBrush="Black" BorderThickness="1" Margin="10">
+        <Border Grid.Column="0" BorderBrush="Black" BorderThickness="1" Margin="10" Background="WhiteSmoke">
             <local:PixelCanvasControl Name="_PixelCanvas"/>
         </Border>
 

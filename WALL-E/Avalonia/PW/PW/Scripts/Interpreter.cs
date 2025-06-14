@@ -18,11 +18,7 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
                 {
                     return (int)left + (int)right;
                 }
-                if (left is string && right is string)
-                {
-                    return (string)left + (string)right;
-                }
-                throw new RuntimeError(expr.operat , "Operands must be two numbers or two strings.");
+                throw new RuntimeError(expr.operat , "Operands must be two numbers");
 
             case TokenType.MINUS:
                 checkNumberOperands(expr.operat, left, right);
@@ -167,11 +163,12 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
     }
     public void visitColorStmt(Stmt.Color color)
     {
-        checkString(color.name, color.color, "Color");
-        string newcolor = stringify(color);
+        checkString(color.name , color.color , "Color.color");
+        string newcolor = stringify(evaluate(color.color));
         if (MainWindow._colorNameMap.ContainsKey(newcolor)) MainWindow.Color(newcolor);
         else
             throw new RuntimeError(color.name, $"Invalid color: {newcolor}");
+
     }
     public void visitSizeStmt(Stmt.Size size)
     {
@@ -283,9 +280,9 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
         if (evaluate(operand) is int) return;
         throw new RuntimeError(operat , $"{where} must be a number.");
     }
-    private  void checkString(Token operat , object operand , string where)
+    private void checkString(Token operat , Expr operand , string where)
     {
-        if (operand is string) return;
+        if (evaluate(operand) is string) return;
         throw new RuntimeError(operat , $"{where} must be a string.");
     }
     private void checkNumberOperands(Token operat, object left, object right)

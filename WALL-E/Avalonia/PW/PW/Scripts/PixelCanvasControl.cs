@@ -6,6 +6,12 @@ using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using System;
 using System.Threading.Tasks;
+using AvaloniaEdit;
+using AvaloniaEdit.Highlighting;
+using System.Text.RegularExpressions;
+using System.Collections;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace PW
 {
@@ -38,7 +44,7 @@ namespace PW
             CanvasDimension = dimension;
             _pixelData = new Color[dimension, dimension];
             Clear(); // Limpia al nuevo tamaño
-            // Wall_E.Set(-1, -1, "Transparent", 1);
+
         }
 
         /// <summary>
@@ -148,6 +154,93 @@ namespace PW
         }
 
 
-    
-    }   
+
+    }
+    public class CustomHighlighting : IHighlightingDefinition
+    {
+        private readonly Dictionary<string, HighlightingColor> _namedColors;
+        private readonly Dictionary<string, HighlightingRuleSet> _namedRuleSets;
+
+        public CustomHighlighting()
+        {
+            MainRuleSet = new HighlightingRuleSet();
+            _namedColors = new Dictionary<string, HighlightingColor>();
+            _namedRuleSets = new Dictionary<string, HighlightingRuleSet>();
+
+            // Define tus colores con nombre
+            _namedColors["Instruction"] = new HighlightingColor
+            {
+                Foreground = new SimpleHighlightingBrush(Colors.Purple),
+                FontWeight = FontWeight.Bold
+            };
+
+            _namedColors["Function"] = new HighlightingColor
+            {
+                Foreground = new SimpleHighlightingBrush(Colors.Green),
+                FontWeight = FontWeight.Bold
+            };
+
+            _namedColors["String"] = new HighlightingColor
+            {
+                Foreground = new SimpleHighlightingBrush(Colors.Peru)
+            };
+            _namedColors["Number"] = new HighlightingColor
+            {
+                Foreground = new SimpleHighlightingBrush(Colors.DarkRed)
+            };
+
+            // Define tus reglas
+            var instructionRule = new HighlightingRule
+            {
+                Regex = new Regex(@"\b(Spawn|Color|Size|DrawLine|DrawCircle|DrawRectangle|Fill)\b"),
+                Color = _namedColors["Instruction"]
+            };
+
+            var functionRule = new HighlightingRule
+            {
+                Regex = new Regex(@"\b(GetActualX|GetActualY|GetCanvasSize|GetColorCount|IsBrushSize|IsBrushColor|IsBrushColor)\b"),
+                Color = _namedColors["Function"]
+            };
+
+
+            var stringRule = new HighlightingRule
+            {
+                Regex = new Regex("\".*?\"|'.*?'"),
+                Color = _namedColors["String"]
+            };
+
+            var numberRule = new HighlightingRule
+            {
+                Regex = new Regex(@"\bd+\b"),
+                Color = _namedColors["Number"]
+            };
+
+            MainRuleSet.Rules.Add(instructionRule);
+            MainRuleSet.Rules.Add(functionRule);
+            MainRuleSet.Rules.Add(stringRule);
+            MainRuleSet.Rules.Add(numberRule);
+        }
+
+        // Implementación de la interfaz
+        public string Name => "CustomHighlighting";
+        public HighlightingRuleSet MainRuleSet { get; }
+
+        public IEnumerable<HighlightingColor> NamedHighlightingColors =>
+            _namedColors.Values;
+
+        public IDictionary<string, string> Properties =>
+            new Dictionary<string, string>();
+
+        public HighlightingColor GetNamedColor(string name)
+        {
+            _namedColors.TryGetValue(name, out var color);
+            return color;
+        }
+
+        public HighlightingRuleSet GetNamedRuleSet(string name)
+        {
+            _namedRuleSets.TryGetValue(name, out var ruleSet);
+            return ruleSet;
+        }
+    }
 }

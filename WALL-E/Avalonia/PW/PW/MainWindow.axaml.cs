@@ -15,6 +15,10 @@ using System.Threading.Tasks;
 using SkiaSharp; // Para diálogos asíncronos
 namespace PW;
 
+using TextMateSharp;
+using AvaloniaEdit.TextMate;
+using AvaloniaEdit.Highlighting.Xshd;
+
 public class Wall_E
 {
 
@@ -61,28 +65,35 @@ public class Wall_E
         private static PixelCanvasControl _pixelCanvas; 
 
         private PixelWallE interpreter;
-        public Wall_E walle; 
+        public Wall_E walle;
 
-        public MainWindow()
-        {
-            InitializeComponent();
-            
-            // Enlazar controles
-            _canvasSizeTextBox = this.FindControl<NumericUpDown>("_CanvasSizeTextBox");
-            _codeEditorTextBox = this.FindControl<TextEditor>("_CodeEditorTextBox");
-            _statusOutputTextBlock = this.FindControl<TextBlock>("_StatusOutputTextBlock");
-            _pixelCanvas = this.FindControl<PixelCanvasControl>("_PixelCanvas"); // ¡Obtenemos el control del canvas!
+    public MainWindow()
+    {
+        InitializeComponent();
 
-            // Conectar eventos
-            this.FindControl<Button>("_ResizeCanvasButton").Click += ResizeCanvasButton_Click;
-            this.FindControl<Button>("_ExecuteButton").Click += ExecuteButton_Click;
-            this.FindControl<Button>("_LoadScriptButton").Click += LoadScriptButton_Click;
-            this.FindControl<Button>("_SaveScriptButton").Click += SaveScriptButton_Click;
-            
-            // Configuración inicial
-            _canvasSizeTextBox.Value = _pixelCanvas.CanvasDimension;
-            interpreter = new PixelWallE(); // Pasamos la MainWindow al intérprete para que pueda interactuar
-            walle = new Wall_E(0, 0, "Red", 1);
+        // Enlazar controles
+        _canvasSizeTextBox = this.FindControl<NumericUpDown>("_CanvasSizeTextBox");
+        _codeEditorTextBox = this.FindControl<TextEditor>("_CodeEditorTextBox");
+        _statusOutputTextBlock = this.FindControl<TextBlock>("_StatusOutputTextBlock");
+        _pixelCanvas = this.FindControl<PixelCanvasControl>("_PixelCanvas"); // ¡Obtenemos el control del canvas!
+
+        // Conectar eventos
+        this.FindControl<Button>("_ResizeCanvasButton").Click += ResizeCanvasButton_Click;
+        this.FindControl<Button>("_ExecuteButton").Click += ExecuteButton_Click;
+        this.FindControl<Button>("_LoadScriptButton").Click += LoadScriptButton_Click;
+        this.FindControl<Button>("_SaveScriptButton").Click += SaveScriptButton_Click;
+
+        // Configuración inicial
+        _canvasSizeTextBox.Value = _pixelCanvas.CanvasDimension;
+        interpreter = new PixelWallE(); // Pasamos la MainWindow al intérprete para que pueda interactuar
+        walle = new Wall_E(-1, -1, "Transparent", 1);
+
+
+        var definition = new HighlightingRuleSet();
+        
+        var highlightingdefinition = new CustomHighlighting() ;
+
+        _codeEditorTextBox.SyntaxHighlighting = highlightingdefinition;
         }
 
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
@@ -109,27 +120,8 @@ public class Wall_E
                 SetStatus($"Error: Color '{colorName}' no es válido.", true);
             }
         }
-        
-        public static void DrawLine(int dirX, int dirY, int distance)
-        {
-            if (dirX < -1 || dirX > 1 || dirY < -1 || dirY > 1)
-        {
-            SetStatus("Parameters out of range: directions are between -1 and 1", true);
-            return;
-        }
-            int currentX = Wall_E.Instance.x;
-            int currentY = Wall_E.Instance.y;
-            
-            // CORRECCIÓN LÓGICA IMPORTANTE: El bucle debe ir de 0 a distance-1
-            for (int i = 0; i < distance; i++)
-            {
-                currentX += dirX;
-                currentY += dirY;
-                Paint(currentX, currentY, Wall_E.Instance.currentColor , Wall_E.Instance.brushSize);
-            }
-            // La nueva posición de Wall-E debería ser (currentX, currentY)
-             MoveWalle(currentX, currentY); 
-        }
+
+
    
     public static void PaintInWallE()
     {
@@ -152,9 +144,9 @@ public class Wall_E
         {
             int newSize = (int)_canvasSizeTextBox.Value;
             _pixelCanvas.ResizeCanvas(newSize);
+        Wall_E.Set(-1, -1, "Transparent", 1);
             SetStatus($"Canvas redimensionado a {newSize}x{newSize}.", false);
         }
-
         private void ExecuteButton_Click(object? sender, RoutedEventArgs e)
         {
         
@@ -164,15 +156,14 @@ public class Wall_E
             return;
         }
         _pixelCanvas.Clear();
-        Wall_E.Set(-1, -1, "Red", 1);
-            
-            SetStatus("Ejecutando código...", false);
+        Wall_E.Set(-1, -1, "Transparent", 1);
+        Wall_E.Instance.isSpawn = false;
+        SetStatus("Ejecutando código...", false);
 
         interpreter = new PixelWallE();
-            interpreter.Run(_codeEditorTextBox.Text);
-            // Después de que el intérprete termine, refresca el canvas UNA VEZ.
-            _pixelCanvas.Refresh();
-
+        interpreter.Run(_codeEditorTextBox.Text);
+        // Después de que el intérprete termine, refresca el canvas UNA VEZ.
+        _pixelCanvas.Refresh();
         }
     private async void LoadScriptButton_Click(object? sender, RoutedEventArgs e)
     {
@@ -252,7 +243,7 @@ public class Wall_E
     //     if (WallEStatusColorTextBlock != null) WallEStatusColorTextBlock.Text = $"Color Pincel: {walle.currentColor}";
     //     if (WallEStatusSizeTextBlock != null) WallEStatusSizeTextBlock.Text = $"Tamaño Pincel: {walle.brushSize}";
     // }
-    public static void MoveWalle(int x, int y)
+    private static void MoveWalle(int x, int y)
     {
         Wall_E.Instance.x = x;
         Wall_E.Instance.y = y;
@@ -271,9 +262,32 @@ public class Wall_E
         Wall_E.Instance.brushSize = size;
     }
     
+        public static void DrawLine(int dirX, int dirY, int distance)
+    {
+        DrawLine(Wall_E.Instance.x, Wall_E.Instance.y, dirX, dirY, distance);
+        
+    }
+        public static void DrawLine(int currentX, int currentY, int dirX, int dirY, int distance)
+    {
+        if (dirX < -1 || dirX > 1 || dirY < -1 || dirY > 1)
+        {
+            SetStatus("Parameters out of range: directions are between -1 and 1", true);
+            return;
+        }
+
+        
+        for (int i = 0; i < distance; i++)
+        {
+            Paint(currentX, currentY, Wall_E.Instance.currentColor, Wall_E.Instance.brushSize);
+            currentX += dirX;
+            currentY += dirY;
+            MoveWalle(currentX, currentY);
+        }
+    }
+    
     public static void DrawCircle(int dirx, int diry, int r)
     {
-        //MoveWalle(walle.x + r*dirx , walle.y + r*diry );
+
 
 
 
@@ -281,13 +295,10 @@ public class Wall_E
     }
     public static void DrawRectangle(int dirx, int diry, int distance, int width, int height)
     {
-        if (dirx == 0 && diry == 0) DrawRectangle(width, height);
+        if ((dirx == 0 && diry == 0 )|| distance == 0) DrawRectangle(width, height);
         else
         {
-            string color = Wall_E.Instance.currentColor;
-            Wall_E.Instance.currentColor = "Transparent";
-            DrawLine(dirx, diry, distance);
-            Wall_E.Instance.currentColor = color;
+            MoveWalle(Wall_E.Instance.x + dirx * distance , Wall_E.Instance.y + diry * distance);
             DrawRectangle(width, height);
         }
     }
@@ -295,47 +306,42 @@ public class Wall_E
     {
         int wallex = Wall_E.Instance.x;
         int walley = Wall_E.Instance.y;
-        int x1 = wallex - width / 2 - 1;
-        int x2 = wallex + width / 2 + 1;
-        int y1 = walley - height / 2 + 1;
-        int y2 = walley - height / 2 + 1;
-
-        Wall_E.Instance.x = x1;
-        Wall_E.Instance.y = y1;
-
+        int x1 = wallex - (width - 1);
+        int x2 = wallex + (width - 1);
+        int y1 = walley - (height - 1);
+        int y2 = walley + (height - 1);
 
         //(x1 , y1) to (x2 , y1)
-        DrawLine(1, 0, x2 - x1);
+        DrawLine(x1, y1, 1, 0, x2 - x1);
         //(x2 , y1) to (x2 , y2)
-        DrawLine(0, 1, y2 - y1);
+        DrawLine(x2, y1, 0, 1, y2 - y1);
         //(x2 , y2) to (x1 , y2)
-        DrawLine(-1, 0, x2 - x1);
+        DrawLine(x2, y2, -1, 0, x2 - x1);
         //(x1 , y2) to (x1 , y1)
-        DrawLine(0, -1, y2 - y1);
+        DrawLine(x1, y2, 0, -1, y2 - y1);
 
-        Wall_E.Instance.x = wallex;
-        Wall_E.Instance.y = walley;
+        MoveWalle(wallex, walley);
 
     }
     public static void Fill()
     {
-         Color newcolor;
-        if (_colorNameMap.ContainsKey(Wall_E.Instance.currentColor)) newcolor = _colorNameMap[Wall_E.Instance.currentColor];
-        else
+        int x = Wall_E.Instance.x;
+        int y = Wall_E.Instance.y;
+        
+        if (!_colorNameMap.ContainsKey(Wall_E.Instance.currentColor))
         {
             SetStatus("Invalid COlor", true);
             return;
         }
-
         // Change 0s for walle.x , walle.y
-        Fill(Wall_E.Instance.x, Wall_E.Instance.y, newcolor);
+        Fill(x, y, GetPixelColorFromCanvas(x , y));
 
     }
     private static void Fill(int x, int y, Color color)
     {
         if (color != GetPixelColorFromCanvas(x, y)) return;
 
-        
+        Paint(x, y, Wall_E.Instance.currentColor , Wall_E.Instance.brushSize);
         Fill(x + 1, y, color);
         Fill(x - 1, y, color);
         Fill(x, y + 1, color);
