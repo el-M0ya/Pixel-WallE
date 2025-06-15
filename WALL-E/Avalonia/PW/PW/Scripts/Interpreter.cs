@@ -299,6 +299,7 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
 
     public void interpret(List<Stmt> statements)
     {
+        line = 1;
         try
         {
             while (line <= statements.Count)

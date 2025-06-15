@@ -23,6 +23,7 @@ public class PixelWallE
         if (HadError) return;
 
         interpreter.interpret(statements);
+        
     }
     public static void Error(int line, string message)
     {

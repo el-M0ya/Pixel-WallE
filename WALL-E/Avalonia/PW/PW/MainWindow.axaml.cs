@@ -21,7 +21,6 @@ using AvaloniaEdit.Highlighting.Xshd;
 
 public class Wall_E
 {
-
     public bool isSpawn = false;
     public int x;
     public int y;
@@ -47,6 +46,7 @@ public class Wall_E
 }
  public partial class MainWindow : Window
     {
+        private static int count = 0;
     public static bool isWallEImage = true;
         // Diccionario de colores, ahora accesible para todos
     public static readonly Dictionary<string, Color> _colorNameMap = new(StringComparer.OrdinalIgnoreCase)
@@ -112,6 +112,7 @@ public class Wall_E
             {
                 if (color != Colors.Transparent) // No pintamos si el color es transparente
                 {
+                    
                     _pixelCanvas.SetPixel(x, y, color);
                 }
             }
@@ -152,10 +153,10 @@ public class Wall_E
         Wall_E.Set(-1, -1, "Transparent", 1);
             SetStatus($"Canvas redimensionado a {newSize}x{newSize}.", false);
         }
-        private void ExecuteButton_Click(object? sender, RoutedEventArgs e)
-        {
-        
-            if (string.IsNullOrWhiteSpace(_codeEditorTextBox.Text))
+    private void ExecuteButton_Click(object? sender, RoutedEventArgs e)
+    {
+
+        if (string.IsNullOrWhiteSpace(_codeEditorTextBox.Text))
         {
             SetStatus("No hay código para ejecutar.", true);
             return;
@@ -165,10 +166,14 @@ public class Wall_E
         Wall_E.Instance.isSpawn = false;
         SetStatus("Ejecutando código...", false);
 
+        count += 1;
+        SetStatus($"{count}", false);
         interpreter = new PixelWallE();
         interpreter.Run(_codeEditorTextBox.Text);
         // Después de que el intérprete termine, refresca el canvas UNA VEZ.
         _pixelCanvas.Refresh();
+
+       
         }
     private async void LoadScriptButton_Click(object? sender, RoutedEventArgs e)
     {

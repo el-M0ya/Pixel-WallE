@@ -22,7 +22,7 @@ public class Scanner
         {"Fill", TokenType.FILL},
         {"GetActualX", TokenType.GETACTUALX},
         {"GetActualY", TokenType.GETACTUALY},
-        {"GetCanvaSize", TokenType.GETCANVASIZE},
+        {"GetCanvasSize", TokenType.GETCANVASIZE},
         {"GetCanvaColorCount", TokenType.GETCOLORCOUNT},
         {"IsCanvasColor", TokenType.ISCANVASCOLOR},
         {"IsBrushColor", TokenType.ISBRUSHCOLOR},
@@ -36,6 +36,7 @@ public class Scanner
     }
     public List<Token> ScanTokens()
     {
+
         while (!isAtEnd())
         {
             start = current;
@@ -43,6 +44,7 @@ public class Scanner
         }
         tokens.Add(new Token(TokenType.EOF, "", null, line));
         return tokens;
+        
     }
     private bool isAtEnd()
     {
