@@ -307,7 +307,7 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
 
     public void interpret(List<Stmt> statements)
     {
-        environment.Reset();
+        environment.Reset(); 
         line = 1;
         // PRIMERA PASADA: Registrar todas las etiquetas
         for (int i = 0; i < statements.Count; i++)
