@@ -26,6 +26,7 @@ public class Wall_E
     public int y;
     public string currentColor;
     public int brushSize;
+
     public static Wall_E Instance { get; private set; }
     public Wall_E(int x, int y, string currentColor, int brushSize)
     {
@@ -44,10 +45,10 @@ public class Wall_E
         Instance.brushSize = brush;
     }
 }
- public partial class MainWindow : Window
-    {
+public partial class MainWindow : Window
+{
     public static bool isWallEImage = true;
-        // Diccionario de colores, ahora accesible para todos
+    // Diccionario de colores, ahora accesible para todos
     public static readonly Dictionary<string, Color> _colorNameMap = new(StringComparer.OrdinalIgnoreCase)
         {
             { "Black", Colors.Black }, { "White", Colors.White },
@@ -56,15 +57,15 @@ public class Wall_E
             { "Orange", Colors.Orange }, { "Purple", Colors.Purple },
             { "Transparent", Colors.Transparent } // Transparente es especial, usualmente significa "no pintar"
         };
-        
-        // Referencias a los controles de la UI
-        private NumericUpDown _canvasSizeTextBox;
-        private TextEditor _codeEditorTextBox;
-        private static TextBlock _statusOutputTextBlock;
-        private static PixelCanvasControl _pixelCanvas; 
 
-        private PixelWallE interpreter;
-        public Wall_E walle;
+    // Referencias a los controles de la UI
+    private NumericUpDown _canvasSizeTextBox;
+    private TextEditor _codeEditorTextBox;
+    private static TextBlock _statusOutputTextBlock;
+    private static PixelCanvasControl _pixelCanvas;
+
+    private PixelWallE interpreter;
+    public Wall_E walle;
 
     public MainWindow()
     {
@@ -89,13 +90,13 @@ public class Wall_E
 
 
         var definition = new HighlightingRuleSet();
-        
-        var highlightingdefinition = new CustomHighlighting() ;
+
+        var highlightingdefinition = new CustomHighlighting();
 
         _codeEditorTextBox.SyntaxHighlighting = highlightingdefinition;
-        }
+    }
 
-        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+    private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
     private void _ChangeImg(object sender, RoutedEventArgs e)
     {
         var image = (Image)((Button)sender).Content;
@@ -104,30 +105,59 @@ public class Wall_E
         : "Assets/WALL-E.png");
         isWallEImage = !isWallEImage;
     }
-
-     public static void Paint(int x, int y, string colorName , int brushsize)
+    public static void Paint(int x, int y, string color, int brushSize)
+    {
+        // Asegurar que el color exista
+        if (_colorNameMap.TryGetValue(color, out Color colorname))
         {
-            if (_colorNameMap.TryGetValue(colorName, out Color color))
+            if (colorname == Colors.Transparent) // No pintamos si el color es transparente
             {
-                if (color != Colors.Transparent) // No pintamos si el color es transparente
-                {
-                    
-                    _pixelCanvas.SetPixel(x, y, color);
-                }
-            }
-            else
-            {
-                SetStatus($"Error: Color '{colorName}' no es válido.", true);
+                return;
             }
         }
+        else
+        {
+            SetStatus($"Error: Color '{color}' no es válido.", true);
+        }
+        // Asegurar que el tamaño del pincel sea impar 
+        if (brushSize % 2 == 0)
+        {
+            brushSize--; // Tomar el número impar inmediatamente menor
+            if (brushSize < 1) brushSize = 1; // Mínimo tamaño 1
+        }
+
+        // Calcular el radio del pincel (mitad del tamaño)
+        int radius = (brushSize - 1) / 2;
+
+        // Iterar sobre el área cuadrada que cubre el pincel
+        for (int offsetX = -radius; offsetX <= radius; offsetX++)
+        {
+            for (int offsetY = -radius; offsetY <= radius; offsetY++)
+            {
+                // Calcular coordenada objetivo
+                int targetX = x + offsetX;
+                int targetY = y + offsetY;
+
+                // Verificar si la coordenada está dentro del canvas
+                if (IsInCanvas(targetX, targetY))
+                {
+                    // Pintar el píxel individual
+                    _pixelCanvas.SetPixel(targetX, targetY, _colorNameMap[color]);
+                }
+            }
+        }
+    }
+    private static bool IsInCanvas(int x, int y)
+    {
+        return x >= 0 && x < _pixelCanvas.CanvasDimension && y>=0 && y < _pixelCanvas.CanvasDimension;
+    }
 
 
-   
     public static void Paint()
     {
         Paint(Wall_E.Instance.x, Wall_E.Instance.y, Wall_E.Instance.currentColor, Wall_E.Instance.brushSize);
     }
-    public static void Paint(int x , int y)
+    public static void Paint(int x, int y)
     {
         Paint(x, y, Wall_E.Instance.currentColor, Wall_E.Instance.brushSize);
     }
@@ -145,13 +175,13 @@ public class Wall_E
         else throw new Exception("Invalid color name");
     }
 
-     private void ResizeCanvasButton_Click(object? sender, RoutedEventArgs e)
-        {
-            int newSize = (int)_canvasSizeTextBox.Value;
-            _pixelCanvas.ResizeCanvas(newSize);
+    private void ResizeCanvasButton_Click(object? sender, RoutedEventArgs e)
+    {
+        int newSize = (int)_canvasSizeTextBox.Value;
+        _pixelCanvas.ResizeCanvas(newSize);
         Wall_E.Set(-1, -1, "Transparent", 1);
-            SetStatus($"Canvas redimensionado a {newSize}x{newSize}.", false);
-        }
+        SetStatus($"Canvas redimensionado a {newSize}x{newSize}.", false);
+    }
     private void ExecuteButton_Click(object? sender, RoutedEventArgs e)
     {
 
@@ -161,6 +191,7 @@ public class Wall_E
             return;
         }
         _pixelCanvas.Clear();
+        _pixelCanvas.ResizeCanvas((int)_canvasSizeTextBox.Value);
         Wall_E.Set(-1, -1, "Transparent", 1);
         Wall_E.Instance.isSpawn = false;
         SetStatus("Ejecutando código...", false);
@@ -177,8 +208,8 @@ public class Wall_E
         // Después de que el intérprete termine, refresca el canvas UNA VEZ.
         _pixelCanvas.Refresh();
 
-       
-        }
+
+    }
     private async void LoadScriptButton_Click(object? sender, RoutedEventArgs e)
     {
         var openDialog = new OpenFileDialog
@@ -244,9 +275,9 @@ public class Wall_E
 
     public static void SetStatus(string message, bool isError)
     {
-        if (_statusOutputTextBlock  == null) return;
-        _statusOutputTextBlock .Text = message;
-        _statusOutputTextBlock .Foreground = isError ? Brushes.Red : Brushes.Green; // O SystemColors.ControlTextBrush para normal
+        if (_statusOutputTextBlock == null) return;
+        _statusOutputTextBlock.Text = message;
+        _statusOutputTextBlock.Foreground = isError ? Brushes.Red : Brushes.Green; // O SystemColors.ControlTextBrush para normal
     }
 
     // public void UpdateWallEStatusDisplay()
@@ -275,13 +306,13 @@ public class Wall_E
     {
         Wall_E.Instance.brushSize = size;
     }
-    
-        public static void DrawLine(int dirX, int dirY, int distance)
+
+    public static void DrawLine(int dirX, int dirY, int distance)
     {
         DrawLine(Wall_E.Instance.x, Wall_E.Instance.y, dirX, dirY, distance);
-        
+
     }
-        public static void DrawLine(int currentX, int currentY, int dirX, int dirY, int distance)
+    public static void DrawLine(int currentX, int currentY, int dirX, int dirY, int distance)
     {
         if (dirX < -1 || dirX > 1 || dirY < -1 || dirY > 1)
         {
@@ -289,7 +320,7 @@ public class Wall_E
             return;
         }
 
-        
+
         for (int i = 0; i < distance; i++)
         {
             Paint(currentX, currentY, Wall_E.Instance.currentColor, Wall_E.Instance.brushSize);
@@ -302,22 +333,28 @@ public class Wall_E
     // 1. Algoritmo del Punto Medio (Midpoint)
     public static void DrawCircle(int dirX, int dirY, int radius)
     {
-        
-    
+
+
         if (dirX == 0 && dirY == 0) DrawCircle(radius);
         else
         {
             MoveWalle(Wall_E.Instance.x + dirX * radius, Wall_E.Instance.y + dirY * radius);
             DrawCircle(radius);
         }
-         }
+    }
     public static void DrawCircle(int radius)
     {
-        if (radius <= 0)
+        if (radius == 0)
         {
-            Paint(Wall_E.Instance.x , Wall_E.Instance.y);
+            Paint(Wall_E.Instance.x, Wall_E.Instance.y);
             return;
         }
+        if (radius <= 0)
+        {
+            DrawCircle(-radius);
+            return;
+        }
+
         int xc = Wall_E.Instance.x;
         int yc = Wall_E.Instance.y;
         int x = 0;
@@ -355,7 +392,7 @@ public class Wall_E
     }
     public static void DrawRectangle(int dirx, int diry, int distance, int width, int height)
     {
-        if ((dirx == 0 && diry == 0 )|| distance == 0) DrawRectangle(width, height);
+        if ((dirx == 0 && diry == 0) || distance == 0) DrawRectangle(width, height);
         if (width == 0 || height == 0) return;
         else
         {
@@ -389,21 +426,21 @@ public class Wall_E
         int x = Wall_E.Instance.x;
         int y = Wall_E.Instance.y;
         if (GetPixelColorFromCanvas(x, y) == _colorNameMap[Wall_E.Instance.currentColor]) return;
-        
+
         if (!_colorNameMap.ContainsKey(Wall_E.Instance.currentColor))
         {
-            SetStatus("Invalid COlor", true);
+            SetStatus("Invalid Color", true);
             return;
         }
         // Change 0s for walle.x , walle.y
-        Fill(x, y, GetPixelColorFromCanvas(x , y));
+        Fill(x, y, GetPixelColorFromCanvas(x, y));
 
     }
     private static void Fill(int x, int y, Color color)
     {
         if (color != GetPixelColorFromCanvas(x, y)) return;
 
-        Paint(x, y, Wall_E.Instance.currentColor , Wall_E.Instance.brushSize);
+        Paint(x, y, Wall_E.Instance.currentColor, Wall_E.Instance.brushSize);
         Fill(x + 1, y, color);
         Fill(x - 1, y, color);
         Fill(x, y + 1, color);

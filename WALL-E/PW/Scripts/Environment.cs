@@ -5,15 +5,20 @@ using System.Collections.Generic;
 
 class Environment
 {
+    
     private Dictionary<string, object> values = new Dictionary<string, object>();
-    private List<Token> labels = new List<Token>();
+    private Dictionary<string , int> labels = new Dictionary<string, int>();
 
+    public void Reset()
+    {
+        values.Clear();
+        labels.Clear();
+    }
 
     public object get(Token name)
     {
         if (values.ContainsKey(name.lexeme))
         {
-            MainWindow.SetStatus($"{values[name.lexeme]}", false);
             return values[name.lexeme];
         }
         throw new RuntimeError(name,
@@ -33,25 +38,25 @@ class Environment
         }
         throw new RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
     }
-    public int getLine(Token name)
+        public int getLine(Token name)
     {
-
-        foreach (Token item in labels)
+        if (labels.TryGetValue(name.lexeme, out int line))
         {
-            if (item.lexeme == name.lexeme) return name.line;
+            return line;
         }
-        throw new RuntimeError(name,
-        "Undefined label '" + name.lexeme + "'.");
+        throw new RuntimeError(name, "Undefined label '" + name.lexeme + "'.");
     }
+
     public void assignLabel(Token name)
     {
-        if (!labels.Contains(name))
+        if (!labels.ContainsKey(name.lexeme))
         {
-            labels.Add(name);
+            // Guarda el lexema y la línea REAL del label
+            labels.Add(name.lexeme, name.line); 
             return;
         }
-        throw new RuntimeError(name, "Labels with the same name '" + name.lexeme + "'.");
+        throw new RuntimeError(name, "Duplicate label '" + name.lexeme + "'.");
     }
+}
     
 
-}

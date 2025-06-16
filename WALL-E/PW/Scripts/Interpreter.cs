@@ -244,7 +244,9 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
     }
     public void visitGoToStmt(Stmt.GoTo stmt)
     {
-        if (isTruth(stmt.condition))
+        object condition = evaluate(stmt.condition);
+
+        if (isTruth(condition))
         {
             line = environment.getLine(stmt.label);
         }
@@ -254,8 +256,6 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
         object value = null;
         if (stmt.initializer != null) value = evaluate(stmt.initializer);
         environment.define(stmt.name.lexeme, value);
-        
-
     }
     public void visitLabelStmt(Stmt.Label stmt)
     {
@@ -274,14 +274,14 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
     {
         if (obj == null) return false;
         if (obj is bool) return (bool)obj;
-        return false;
+        return true;
     }
     private static bool isEqual(object a, object b)
     {
         if (a == null && b == null) return true;
         if (a == null) return false;
 
-        return a != b;
+        return a == b;
     }
     private  void checkNumber(Token operat , Expr operand , string where)
     {
@@ -307,25 +307,35 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
 
     public void interpret(List<Stmt> statements)
     {
+        environment.Reset();
         line = 1;
-        try
+        // PRIMERA PASADA: Registrar todas las etiquetas
+        for (int i = 0; i < statements.Count; i++)
         {
-            foreach (Stmt stmt in statements)
+            if (statements[i] is Stmt.Label labelStmt)
             {
-                if (stmt is Stmt.Label label) environment.assignLabel(label.label);
-                line++;
-            }
-            line = 1;
-            while (line <= statements.Count)
-            {
-                execute(statements[line - 1]);
-                line++;
+                environment.assignLabel(labelStmt.label);
             }
         }
-        catch (RuntimeError error)
+
+        // SEGUNDA PASADA: Ejecución
+        int count = 0;
+        line = 1;
+        while (line <= statements.Count)
         {
-            MainWindow.SetStatus(error.Message, true);
-            PixelWallE.runtimeError(error);
+            try
+            {
+                if (count > 1000) throw new RuntimeError(new Token(TokenType.GOTO, null, null, 0), "Stack overflow");
+                execute(statements[line - 1]);
+                count++;
+                line++;
+            }
+
+            catch (RuntimeError error)
+            {
+                MainWindow.SetStatus(error.Message, true);
+                PixelWallE.runtimeError(error);
+            }
         }
     }
     private void execute(Stmt stmt)

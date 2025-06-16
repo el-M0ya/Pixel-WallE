@@ -114,6 +114,8 @@ public class Parser
         Token label = consume(TokenType.IDENTIFIER, "Expect variable name.");
         consume(TokenType.JUMPLINE, "Expect 'line' after label declaration.");
         return new Stmt.Label(label);
+
+        
     }
 
     private Stmt GoToStatement()

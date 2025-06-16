@@ -222,7 +222,7 @@ namespace PW
             var operatorRule = new HighlightingRule
             {
                 Regex = new Regex(@"\b(-|/|=|<|>|!|<-|%)\b"),
-                Color = _namedColors["Number"]
+                Color = _namedColors["Operator"]
             };
 
             MainRuleSet.Rules.Add(instructionRule);
