@@ -21,7 +21,7 @@
             <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" Margin="5">
                 <Button Name="_SaveScriptButton" Content="Save" Margin="2" Width="60"/>
                 <Button Margin="2" Width="60" Height="60" Click="_ChangeImg">
-                    <Image Source="C:\000mio\Universidad\Programacion\Avalonia Pojects\WALL-E\Avalonia\PW\PW\Assets\WALL-E.png" Stretch="Uniform" />
+                    <Image Source="Assets/WALL-E.png" Stretch="Uniform" />
                 </Button>
                 <Button Name="_LoadScriptButton" Content="Load" Margin="2" Width="60"/>
             </StackPanel>

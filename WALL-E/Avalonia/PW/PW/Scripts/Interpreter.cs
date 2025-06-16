@@ -33,6 +33,14 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
                 checkNumberOperands(expr.operat, left, right);
                 return (int)left * (int)right;
 
+            case TokenType.DOUBLE_STAR:
+                checkNumberOperands(expr.operat, left, right);
+                return (int)Math.Pow((int)left , (int)right);
+
+            case TokenType.PERCENT:
+                checkNumberOperands(expr.operat, left, right);
+                return (int)left % (int)right;
+
             case TokenType.GREATER:
                 checkNumberOperands(expr.operat, left, right);
                 return (int)left > (int)right;
@@ -251,7 +259,7 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
     }
     public void visitLabelStmt(Stmt.Label stmt)
     {
-        environment.assignLabel(stmt.label);
+        
 
     }
     public object visitAssign(Expr.Assign expr)
@@ -302,6 +310,12 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
         line = 1;
         try
         {
+            foreach (Stmt stmt in statements)
+            {
+                if (stmt is Stmt.Label label) environment.assignLabel(label.label);
+                line++;
+            }
+            line = 1;
             while (line <= statements.Count)
             {
                 execute(statements[line - 1]);

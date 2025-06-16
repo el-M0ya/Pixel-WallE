@@ -10,8 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <AvaloniaResource Include="C:\000mio\Universidad\Programacion\Avalonia Pojects\WALL-E\Avalonia\PW\PW\Assets\EVA.png" />
-    <AvaloniaResource Include="C:\000mio\Universidad\Programacion\Avalonia Pojects\WALL-E\Avalonia\PW\PW\Assets\WALL-E.png" />
+    <AvaloniaResource Include="Assets\**" />
     <PackageReference Include="Avalonia" Version="11.3.1" />
     <PackageReference Include="Avalonia.AvaloniaEdit" Version="11.3.0" />
     <PackageReference Include="Avalonia.Desktop" Version="11.3.1" />

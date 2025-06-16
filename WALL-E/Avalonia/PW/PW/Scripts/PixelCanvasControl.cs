@@ -55,6 +55,7 @@ namespace PW
             if (x < 0 || x >= CanvasDimension || y < 0 || y >= CanvasDimension)
             {
                 MainWindow.SetStatus("Out of range", true);
+                
                 return;
             }
             _pixelData[x, y] = color;
@@ -146,8 +147,8 @@ namespace PW
             if (wallex < 0 || wallex > CanvasDimension || walley < 0 || walley > CanvasDimension) return;
 
             var image = new Bitmap(!MainWindow.isWallEImage
-            ? "C:/000mio/Universidad/Programacion/Avalonia Pojects/WALL-E/Avalonia/PW/PW/Assets/EVA.png"
-            : "C:/000mio/Universidad/Programacion/Avalonia Pojects/WALL-E/Avalonia/PW/PW/Assets/WALL-E.png");
+            ? "Assets/EVA.png"
+            : "Assets/WALL-E.png");
 
             Rect destRect = new Rect(wallex * cellWidth, walley * cellHeight, cellWidth, cellHeight);
             context.DrawImage(image, destRect);
@@ -170,7 +171,7 @@ namespace PW
             // Define tus colores con nombre
             _namedColors["Instruction"] = new HighlightingColor
             {
-                Foreground = new SimpleHighlightingBrush(Colors.Purple),
+                Foreground = new SimpleHighlightingBrush(Colors.Violet),
                 FontWeight = FontWeight.Bold
             };
 
@@ -188,6 +189,10 @@ namespace PW
             {
                 Foreground = new SimpleHighlightingBrush(Colors.DarkRed)
             };
+            _namedColors["Operator"] = new HighlightingColor
+            {
+                Foreground = new SimpleHighlightingBrush(Colors.RoyalBlue)
+            };
 
             // Define tus reglas
             var instructionRule = new HighlightingRule
@@ -198,7 +203,7 @@ namespace PW
 
             var functionRule = new HighlightingRule
             {
-                Regex = new Regex(@"\b(GetActualX|GetActualY|GetCanvasSize|GetColorCount|IsBrushSize|IsBrushColor|IsBrushColor)\b"),
+                Regex = new Regex(@"\b(GetActualX|GetActualY|GetCanvasSize|GetColorCount|IsBrushSize|IsBrushColor|IsBrushColor|GoTo)\b"),
                 Color = _namedColors["Function"]
             };
 
@@ -214,11 +219,17 @@ namespace PW
                 Regex = new Regex(@"\bd+\b"),
                 Color = _namedColors["Number"]
             };
+            var operatorRule = new HighlightingRule
+            {
+                Regex = new Regex(@"\b(-|/|=|<|>|!|%)\b"),
+                Color = _namedColors["Number"]
+            };
 
             MainRuleSet.Rules.Add(instructionRule);
             MainRuleSet.Rules.Add(functionRule);
             MainRuleSet.Rules.Add(stringRule);
             MainRuleSet.Rules.Add(numberRule);
+            MainRuleSet.Rules.Add(operatorRule);
         }
 
         // Implementación de la interfaz

@@ -23,7 +23,7 @@ public class Scanner
         {"GetActualX", TokenType.GETACTUALX},
         {"GetActualY", TokenType.GETACTUALY},
         {"GetCanvasSize", TokenType.GETCANVASIZE},
-        {"GetCanvaColorCount", TokenType.GETCOLORCOUNT},
+        {"GetColorCount", TokenType.GETCOLORCOUNT},
         {"IsCanvasColor", TokenType.ISCANVASCOLOR},
         {"IsBrushColor", TokenType.ISBRUSHCOLOR},
         {"IsBrushSize", TokenType.ISBRUSHSIZE},
@@ -65,7 +65,7 @@ public class Scanner
             case '.': addToken(TokenType.DOT); break;
             case '-': addToken(TokenType.MINUS); break;
             case '+': addToken(TokenType.PLUS); break;
-            case ';': addToken(TokenType.JUMPLINE); line++;  break;
+            case '%': addToken(TokenType.PERCENT);  break;
             
 
             case '&':

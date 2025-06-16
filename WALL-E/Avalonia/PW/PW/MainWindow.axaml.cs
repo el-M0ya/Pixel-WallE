@@ -46,7 +46,6 @@ public class Wall_E
 }
  public partial class MainWindow : Window
     {
-        private static int count = 0;
     public static bool isWallEImage = true;
         // Diccionario de colores, ahora accesible para todos
     public static readonly Dictionary<string, Color> _colorNameMap = new(StringComparer.OrdinalIgnoreCase)
@@ -101,8 +100,8 @@ public class Wall_E
     {
         var image = (Image)((Button)sender).Content;
         image.Source = new Bitmap(isWallEImage
-        ? "C:/000mio/Universidad/Programacion/Avalonia Pojects/WALL-E/Avalonia/PW/PW/Assets/EVA.png"
-        : "C:/000mio/Universidad/Programacion/Avalonia Pojects/WALL-E/Avalonia/PW/PW/Assets/WALL-E.png");
+        ? "Assets/EVA.png"
+        : "Assets/WALL-E.png");
         isWallEImage = !isWallEImage;
     }
 
@@ -166,10 +165,15 @@ public class Wall_E
         Wall_E.Instance.isSpawn = false;
         SetStatus("Ejecutando código...", false);
 
-        count += 1;
-        SetStatus($"{count}", false);
         interpreter = new PixelWallE();
-        interpreter.Run(_codeEditorTextBox.Text);
+        try
+        {
+            interpreter.Run(_codeEditorTextBox.Text);
+        }
+        catch (RuntimeError error)
+        {
+            SetStatus($"Error: {error.Message}", true);
+        }
         // Después de que el intérprete termine, refresca el canvas UNA VEZ.
         _pixelCanvas.Refresh();
 
@@ -232,11 +236,11 @@ public class Wall_E
     }
 
     // --- Utilidades ---
-    private static uint ConvertAvaloniaColorToUint32(Color color)
-    {
-        // Formato BGRA8888: Blue en el byte menos significativo
-        return (uint)(color.B | (color.G << 8) | (color.R << 16) | (color.A << 24));
-    }
+    // private static uint ConvertAvaloniaColorToUint32(Color color)
+    // {
+    //     // Formato BGRA8888: Blue en el byte menos significativo
+    //     return (uint)(color.B | (color.G << 8) | (color.R << 16) | (color.A << 24));
+    // }
 
     public static void SetStatus(string message, bool isError)
     {
@@ -352,9 +356,10 @@ public class Wall_E
     public static void DrawRectangle(int dirx, int diry, int distance, int width, int height)
     {
         if ((dirx == 0 && diry == 0 )|| distance == 0) DrawRectangle(width, height);
+        if (width == 0 || height == 0) return;
         else
         {
-            MoveWalle(Wall_E.Instance.x + dirx * distance , Wall_E.Instance.y + diry * distance);
+            MoveWalle(Wall_E.Instance.x + dirx * distance, Wall_E.Instance.y + diry * distance);
             DrawRectangle(width, height);
         }
     }
@@ -383,6 +388,7 @@ public class Wall_E
     {
         int x = Wall_E.Instance.x;
         int y = Wall_E.Instance.y;
+        if (GetPixelColorFromCanvas(x, y) == _colorNameMap[Wall_E.Instance.currentColor]) return;
         
         if (!_colorNameMap.ContainsKey(Wall_E.Instance.currentColor))
         {

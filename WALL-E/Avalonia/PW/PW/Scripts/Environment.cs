@@ -13,14 +13,16 @@ class Environment
     {
         if (values.ContainsKey(name.lexeme))
         {
+            MainWindow.SetStatus($"{values[name.lexeme]}", false);
             return values[name.lexeme];
         }
         throw new RuntimeError(name,
         "Undefined variable '" + name.lexeme + "'.");
     }
     public void define(string name, object value)
-    { 
-        values.Add(name, value);
+    {
+        if (values.ContainsKey(name)) values[name] = value;
+        else values.Add(name, value);
     }
     public void assign(Token name, object value)
     {
@@ -36,7 +38,7 @@ class Environment
 
         foreach (Token item in labels)
         {
-            if (item == name) return name.line;
+            if (item.lexeme == name.lexeme) return name.line;
         }
         throw new RuntimeError(name,
         "Undefined label '" + name.lexeme + "'.");

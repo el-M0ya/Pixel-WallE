@@ -252,6 +252,7 @@ public class Parser
 
     private Expr GetActualX()
     {
+        Token name = consume(TokenType.GETACTUALX, "No GetActualX expression found");
         consume(TokenType.LEFT_PAREN, "Expect '(' after 'GetActualX' function'.");
         consume(TokenType.RIGHT_PAREN, "Expect ')' after '('.");
 
@@ -260,6 +261,7 @@ public class Parser
     }
     private Expr GetActualY()
     {
+        Token name = consume(TokenType.GETACTUALY, "No GetActualY expression found");
         consume(TokenType.LEFT_PAREN, "Expect '(' after 'GetActualY' function'.");
         consume(TokenType.RIGHT_PAREN, "Expect ')' after '('.");
 
@@ -268,6 +270,7 @@ public class Parser
     }
     private Expr GetCanvasSize()
     {
+        Token name = consume(TokenType.GETCANVASIZE, "No GetCanvasSize expression found");
         consume(TokenType.LEFT_PAREN, "Expect '(' after 'GetCanvasSize' function'.");
         consume(TokenType.RIGHT_PAREN, "Expect ')' after '('.");
 
@@ -275,6 +278,7 @@ public class Parser
     }
     private Expr GetColorCount()
     {
+        
         Token name = consume(TokenType.GETCOLORCOUNT, "No GetColorCount expression found");
         consume(TokenType.LEFT_PAREN, "Expect '(' after 'GetActualX' function'.");
 
@@ -337,9 +341,9 @@ public class Parser
         {
             Token equals = previous();
             Expr value = assignment();
-            if (expr is Expr.Var)
+            if (expr is Expr.Var var)
             {
-                Token name = ((Expr.Var)expr).name;
+                Token name = var.name;
                 return new Expr.Assign(name, value);
             }
             error(equals, "Invalid assignment target.");
@@ -407,7 +411,7 @@ public class Parser
     private Expr factor()
     {
         Expr expr = unary();
-        while (match([TokenType.SLASH, TokenType.STAR]))
+        while (match([TokenType.SLASH, TokenType.STAR, TokenType.DOUBLE_STAR, TokenType.PERCENT]))
         {
             Token oper = previous();
             Expr right = unary();
@@ -430,14 +434,15 @@ public class Parser
     private Expr primary()
 
     {
-        if (match([TokenType.GETACTUALX])) return GetActualX();
-        if (match([TokenType.GETACTUALY])) return GetActualY();
-        if (match([TokenType.GETCANVASIZE])) return GetCanvasSize();
-        if (match([TokenType.GETCOLORCOUNT])) return GetColorCount();
-        if (match([TokenType.ISBRUSHSIZE])) return IsBrushSize();
-        if (match([TokenType.ISBRUSHCOLOR])) return IsBrushColor();
-        if (match([TokenType.ISCANVASCOLOR])) return IsCanvasColor();
-        if (match([TokenType.NULL])) return new Expr.Literal(null);
+
+        if (match([TokenType.GETACTUALX])) { current -= 1; return GetActualX(); }
+        if (match([TokenType.GETACTUALY])) {current -= 1 ; return GetActualY();}
+        if (match([TokenType.GETCANVASIZE])) {current -= 1 ; return GetCanvasSize();}
+        if (match([TokenType.GETCOLORCOUNT])){current -= 1 ;  return GetColorCount();}
+        if (match([TokenType.ISBRUSHSIZE])) {current -= 1 ; return IsBrushSize();}
+        if (match([TokenType.ISBRUSHCOLOR])) {current -= 1 ; return IsBrushColor();}
+        if (match([TokenType.ISCANVASCOLOR])) {current -= 1 ; return IsCanvasColor();}
+        if (match([TokenType.NULL]))  return new Expr.Literal(null);
         if (match([TokenType.NUMBER, TokenType.STRING])) return new Expr.Literal(previous().literal);
         if (match([TokenType.IDENTIFIER])) return new Expr.Var(previous());
         if (match([TokenType.LEFT_PAREN]))
