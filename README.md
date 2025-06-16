@@ -4,7 +4,7 @@
   <img src="WALL-E/PW/Assets/avalonia-logo.jpeg" alt="Avalonia" width="200"/>
   <img src="WALL-E/PW/Assets/csharp-logo.png" alt="C#" width="150"/>
   <br>
-  <img src="WALL-E/PW/AssetsAssets/Assets/PWScreenShot.png" alt="Application Demo" width="600"/>
+  <img src="WALL-E/PW/Assets/PWScreenShot.png" alt="Application Demo" width="600"/>
 </div>
 
 ## 📝 Project Description
