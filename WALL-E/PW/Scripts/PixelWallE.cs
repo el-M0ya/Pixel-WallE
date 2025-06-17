@@ -3,6 +3,7 @@ namespace PW;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 
 public class PixelWallE
 {
@@ -11,7 +12,7 @@ public class PixelWallE
     public static bool HadRuntimeError { get; private set; } = false;
 
     public PixelWallE() { }
-    public void Run(string source)
+    public async Task  Run(string source)
     {
         HadError = false;
         Scanner scanner = new Scanner(source);
@@ -22,7 +23,7 @@ public class PixelWallE
         // Stop if there was a syntax error.
         if (HadError) return;
 
-        interpreter.interpret(statements);
+        await interpreter.interpret(statements);
         
     }
     public static void Error(int line, string message)

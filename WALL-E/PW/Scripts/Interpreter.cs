@@ -2,6 +2,7 @@ namespace PW;
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
 {
@@ -184,7 +185,7 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
         int newsize = (int)evaluate(size.size);
         MainWindow.Size(newsize);
     }
-    public void visitDrawLineStmt(Stmt.DrawLine drawLine)
+    public async Task visitDrawLineStmt(Stmt.DrawLine drawLine)
     {
         checkNumber(drawLine.name ,drawLine.dirX, "DrawLine.dirX");
         checkNumber(drawLine.name ,drawLine.dirY, "DrawLine.dirY");
@@ -199,9 +200,9 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
             y = -y;
             distance = -distance;
         }
-        MainWindow.DrawLine(x , y , distance);
+        await MainWindow.DrawLine(x , y , distance);
     }
-    public void visitDrawCircleStmt(Stmt.DrawCircle drawCircle)
+    public async Task visitDrawCircleStmt(Stmt.DrawCircle drawCircle)
     {
         checkNumber(drawCircle.name ,drawCircle.dirX, "DrawCircle.dirX");
         checkNumber(drawCircle.name ,drawCircle.dirY, "DrawCircle.dirY");
@@ -211,9 +212,9 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
          if (x < -1 || x > 1 || y < -1 || y > 1) throw new RuntimeError(drawCircle.name , "Parameters out of range: directions are between -1 and 1");
         int radius = (int)evaluate(drawCircle.radius);
         if (radius < 0) radius = -radius;
-        MainWindow.DrawCircle(x , y , radius);
+       await MainWindow.DrawCircle(x , y , radius);
     }
-    public void visitDrawRectangleStmt(Stmt.DrawRectangle drawRectangle)
+    public async Task visitDrawRectangleStmt(Stmt.DrawRectangle drawRectangle)
     {
         checkNumber(drawRectangle.name ,drawRectangle.dirX, "DrawRectangle.dirX");
         checkNumber(drawRectangle.name ,drawRectangle.dirY, "DrawRectangle.dirY");
@@ -236,11 +237,11 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
         int height = (int)evaluate(drawRectangle.height);
         if (height < 0) height = -height;
         
-        MainWindow.DrawRectangle(x , y , distance , width , height);
+         await MainWindow.DrawRectangle(x , y , distance , width , height);
     }
-    public void visitFillStmt(Stmt.Fill fill)
+    public async Task visitFillStmt(Stmt.Fill fill)
     {
-        MainWindow.Fill();
+        await MainWindow.Fill();
     }
     public void visitGoToStmt(Stmt.GoTo stmt)
     {
@@ -305,7 +306,7 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
         return expr.Accept(this);
     }
 
-    public void interpret(List<Stmt> statements)
+    public async Task interpret(List<Stmt> statements)
     {
         environment.Reset(); 
         line = 1;
@@ -326,21 +327,52 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
             try
             {
                 if (count > 1000) throw new RuntimeError(new Token(TokenType.GOTO, null, null, 0), "Stack overflow");
-                execute(statements[line - 1]);
+
+                Stmt stmt = statements[line - 1];
+                if (stmt is Stmt.DrawLine ||
+                     stmt is Stmt.DrawCircle ||
+                     stmt is Stmt.DrawRectangle ||
+                     stmt is Stmt.Fill)await executeAsync(stmt);
+                else
+                    execute(stmt);
                 count++;
                 line++;
             }
 
             catch (RuntimeError error)
             {
+                await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+            {
                 MainWindow.SetStatus(error.Message, true);
-                PixelWallE.runtimeError(error);
+                if (error is RuntimeError runtimeError)
+                    PixelWallE.runtimeError(runtimeError);
+            });
+            break;
             }
         }
     }
     private void execute(Stmt stmt)
     {
         stmt.Accept(this);
+    }
+    private async Task executeAsync(Stmt stmt)
+    {
+        if (stmt is Stmt.DrawLine drawLine)
+    {
+        await visitDrawLineStmt(drawLine);
+    }
+    else if (stmt is Stmt.DrawCircle drawCircle)
+    {
+        await visitDrawCircleStmt(drawCircle);
+    }
+    else if (stmt is Stmt.DrawRectangle drawRectangle)
+    {
+        await visitDrawRectangleStmt(drawRectangle);
+    }
+    else if (stmt is Stmt.Fill fill)
+    {
+        await visitFillStmt(fill);
+    }
     }
      private string stringify(object obj)
     {

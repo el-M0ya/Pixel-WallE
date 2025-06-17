@@ -105,7 +105,7 @@ public partial class MainWindow : Window
         : "Assets/WALL-E.png");
         isWallEImage = !isWallEImage;
     }
-    public static void Paint(int x, int y, string color, int brushSize)
+    public static async Task Paint(int x, int y, string color, int brushSize)
     {
         // Asegurar que el color exista
         if (_colorNameMap.TryGetValue(color, out Color colorname))
@@ -142,7 +142,10 @@ public partial class MainWindow : Window
                 if (IsInCanvas(targetX, targetY))
                 {
                     // Pintar el píxel individual
-                    _pixelCanvas.SetPixel(targetX, targetY, _colorNameMap[color]);
+                    await _pixelCanvas.SetPixel(targetX, targetY, _colorNameMap[color]);
+                    _pixelCanvas.Refresh(); // Forzar actualización después de cada píxel
+                    await Task.Delay(10); // Pequeño retraso para visualización
+                
                 }
             }
         }
@@ -153,13 +156,13 @@ public partial class MainWindow : Window
     }
 
 
-    public static void Paint()
+    public static async Task Paint()
     {
-        Paint(Wall_E.Instance.x, Wall_E.Instance.y, Wall_E.Instance.currentColor, Wall_E.Instance.brushSize);
+       await Paint(Wall_E.Instance.x, Wall_E.Instance.y, Wall_E.Instance.currentColor, Wall_E.Instance.brushSize);
     }
-    public static void Paint(int x, int y)
+    public static async Task Paint(int x, int y)
     {
-        Paint(x, y, Wall_E.Instance.currentColor, Wall_E.Instance.brushSize);
+        await Paint(x, y, Wall_E.Instance.currentColor, Wall_E.Instance.brushSize);
     }
 
 
@@ -182,33 +185,39 @@ public partial class MainWindow : Window
         Wall_E.Set(-1, -1, "Transparent", 1);
         SetStatus($"Canvas redimensionado a {newSize}x{newSize}.", false);
     }
-    private void ExecuteButton_Click(object? sender, RoutedEventArgs e)
+    private async void ExecuteButton_Click(object? sender, RoutedEventArgs e)
     {
-
-        if (string.IsNullOrWhiteSpace(_codeEditorTextBox.Text))
-        {
-            SetStatus("No hay código para ejecutar.", true);
-            return;
-        }
-        _pixelCanvas.Clear();
-        _pixelCanvas.ResizeCanvas((int)_canvasSizeTextBox.Value);
-        Wall_E.Set(-1, -1, "Transparent", 1);
-        Wall_E.Instance.isSpawn = false;
-        SetStatus("Ejecutando código...", false);
-
-        interpreter = new PixelWallE();
+        // ExecuteButton.IsEnabled = false;
+        // StopButton.IsEnabled = true;
         try
         {
-            interpreter.Run(_codeEditorTextBox.Text);
+            if (string.IsNullOrWhiteSpace(_codeEditorTextBox.Text))
+            {
+                SetStatus("No hay código para ejecutar.", true);
+                return;
+            }
+            _pixelCanvas.Clear();
+            _pixelCanvas.ResizeCanvas((int)_canvasSizeTextBox.Value);
+            Wall_E.Set(-1, -1, "Transparent", 1);
+            Wall_E.Instance.isSpawn = false;
+            SetStatus("Ejecutando código...", false);
+
+            interpreter = new PixelWallE();
+            await interpreter.Run(_codeEditorTextBox.Text);
         }
         catch (RuntimeError error)
         {
             SetStatus($"Error: {error.Message}", true);
         }
-        // Después de que el intérprete termine, refresca el canvas UNA VEZ.
-        _pixelCanvas.Refresh();
-
-
+        finally
+        {
+            // Después de que el intérprete termine, refresca el canvas.
+            _pixelCanvas.Refresh();
+            // ExecuteButton.IsEnabled = true;
+            // StopButton.IsEnabled = false;
+        }
+        
+        
     }
     private async void LoadScriptButton_Click(object? sender, RoutedEventArgs e)
     {
@@ -235,7 +244,7 @@ public partial class MainWindow : Window
         }
     }
 
-    private async void SaveScriptButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private async void SaveScriptButton_Click(object? sender, RoutedEventArgs e)
     {
         if (_codeEditorTextBox == null || string.IsNullOrWhiteSpace(_codeEditorTextBox.Text))
         {
@@ -266,28 +275,12 @@ public partial class MainWindow : Window
         }
     }
 
-    // --- Utilidades ---
-    // private static uint ConvertAvaloniaColorToUint32(Color color)
-    // {
-    //     // Formato BGRA8888: Blue en el byte menos significativo
-    //     return (uint)(color.B | (color.G << 8) | (color.R << 16) | (color.A << 24));
-    // }
-
     public static void SetStatus(string message, bool isError)
     {
         if (_statusOutputTextBlock == null) return;
         _statusOutputTextBlock.Text = message;
         _statusOutputTextBlock.Foreground = isError ? Brushes.Red : Brushes.Green; // O SystemColors.ControlTextBrush para normal
     }
-
-    // public void UpdateWallEStatusDisplay()
-    // {
-
-    //     if (WallEStatusXTextBlock != null) WallEStatusXTextBlock.Text = $"X: {walle.x}";
-    //     if (WallEStatusYTextBlock != null) WallEStatusYTextBlock.Text = $"Y: {walle.y}";
-    //     if (WallEStatusColorTextBlock != null) WallEStatusColorTextBlock.Text = $"Color Pincel: {walle.currentColor}";
-    //     if (WallEStatusSizeTextBlock != null) WallEStatusSizeTextBlock.Text = $"Tamaño Pincel: {walle.brushSize}";
-    // }
     private static void MoveWalle(int x, int y)
     {
         Wall_E.Instance.x = x;
@@ -307,12 +300,11 @@ public partial class MainWindow : Window
         Wall_E.Instance.brushSize = size;
     }
 
-    public static void DrawLine(int dirX, int dirY, int distance)
+    public static async Task DrawLine(int dirX, int dirY, int distance)
     {
-        DrawLine(Wall_E.Instance.x, Wall_E.Instance.y, dirX, dirY, distance);
-
+        await DrawLine(Wall_E.Instance.x, Wall_E.Instance.y, dirX, dirY, distance);
     }
-    public static void DrawLine(int currentX, int currentY, int dirX, int dirY, int distance)
+    public static async Task DrawLine(int currentX, int currentY, int dirX, int dirY, int distance)
     {
         if (dirX < -1 || dirX > 1 || dirY < -1 || dirY > 1)
         {
@@ -323,7 +315,7 @@ public partial class MainWindow : Window
 
         for (int i = 0; i < distance; i++)
         {
-            Paint(currentX, currentY, Wall_E.Instance.currentColor, Wall_E.Instance.brushSize);
+            await Paint(currentX, currentY, Wall_E.Instance.currentColor, Wall_E.Instance.brushSize);
             currentX += dirX;
             currentY += dirY;
             MoveWalle(currentX, currentY);
@@ -331,27 +323,27 @@ public partial class MainWindow : Window
     }
 
     // 1. Algoritmo del Punto Medio (Midpoint)
-    public static void DrawCircle(int dirX, int dirY, int radius)
+    public static async Task DrawCircle(int dirX, int dirY, int radius)
     {
 
 
-        if (dirX == 0 && dirY == 0) DrawCircle(radius);
+        if (dirX == 0 && dirY == 0) await DrawCircle(radius);
         else
         {
             MoveWalle(Wall_E.Instance.x + dirX * radius, Wall_E.Instance.y + dirY * radius);
-            DrawCircle(radius);
+           await DrawCircle(radius);
         }
     }
-    public static void DrawCircle(int radius)
+    public static async Task DrawCircle(int radius)
     {
         if (radius == 0)
         {
-            Paint(Wall_E.Instance.x, Wall_E.Instance.y);
+            await Paint(Wall_E.Instance.x, Wall_E.Instance.y);
             return;
         }
         if (radius <= 0)
         {
-            DrawCircle(-radius);
+           await DrawCircle(-radius);
             return;
         }
 
@@ -361,7 +353,7 @@ public partial class MainWindow : Window
         int y = radius;
         int d = 1 - radius;
 
-        PaintCirclePoints(xc, yc, x, y);
+        await PaintCirclePoints(xc, yc, x, y);
 
         while (x < y)
         {
@@ -375,32 +367,32 @@ public partial class MainWindow : Window
                 y--;
                 d += 2 * (x - y) + 1;
             }
-            PaintCirclePoints(xc, yc, x, y);
+           await PaintCirclePoints(xc, yc, x, y);
         }
     }
 
-    private static void PaintCirclePoints(int xc, int yc, int x, int y)
+    private static async Task PaintCirclePoints(int xc, int yc, int x, int y)
     {
-        Paint(xc + x, yc + y);
-        Paint(xc - x, yc + y);
-        Paint(xc + x, yc - y);
-        Paint(xc - x, yc - y);
-        Paint(xc + y, yc + x);
-        Paint(xc - y, yc + x);
-        Paint(xc + y, yc - x);
-        Paint(xc - y, yc - x);
+        await Paint(xc + x, yc + y);
+        await Paint(xc - x, yc + y);
+        await Paint(xc + x, yc - y);
+        await Paint(xc - x, yc - y);
+        await Paint(xc + y, yc + x);
+        await Paint(xc - y, yc + x);
+        await Paint(xc + y, yc - x);
+        await Paint(xc - y, yc - x);
     }
-    public static void DrawRectangle(int dirx, int diry, int distance, int width, int height)
+    public static async Task DrawRectangle(int dirx, int diry, int distance, int width, int height)
     {
-        if ((dirx == 0 && diry == 0) || distance == 0) DrawRectangle(width, height);
+        if ((dirx == 0 && diry == 0) || distance == 0) await DrawRectangle(width, height);
         if (width == 0 || height == 0) return;
         else
         {
             MoveWalle(Wall_E.Instance.x + dirx * distance, Wall_E.Instance.y + diry * distance);
-            DrawRectangle(width, height);
+            await DrawRectangle(width, height);
         }
     }
-    public static void DrawRectangle(int width, int height)
+    public static async Task DrawRectangle(int width, int height)
     {
         int wallex = Wall_E.Instance.x;
         int walley = Wall_E.Instance.y;
@@ -410,18 +402,18 @@ public partial class MainWindow : Window
         int y2 = walley + (height - 1);
 
         //(x1 , y1) to (x2 , y1)
-        DrawLine(x1, y1, 1, 0, x2 - x1);
+        await DrawLine(x1, y1, 1, 0, x2 - x1);
         //(x2 , y1) to (x2 , y2)
-        DrawLine(x2, y1, 0, 1, y2 - y1);
+        await DrawLine(x2, y1, 0, 1, y2 - y1);
         //(x2 , y2) to (x1 , y2)
-        DrawLine(x2, y2, -1, 0, x2 - x1);
+        await DrawLine(x2, y2, -1, 0, x2 - x1);
         //(x1 , y2) to (x1 , y1)
-        DrawLine(x1, y2, 0, -1, y2 - y1);
+        await DrawLine(x1, y2, 0, -1, y2 - y1);
 
         MoveWalle(wallex, walley);
 
     }
-    public static void Fill()
+    public static async Task Fill()
     {
         int x = Wall_E.Instance.x;
         int y = Wall_E.Instance.y;
@@ -433,18 +425,18 @@ public partial class MainWindow : Window
             return;
         }
         // Change 0s for walle.x , walle.y
-        Fill(x, y, GetPixelColorFromCanvas(x, y));
+        await Fill(x, y, GetPixelColorFromCanvas(x, y));
 
     }
-    private static void Fill(int x, int y, Color color)
+    private static async Task Fill(int x, int y, Color color)
     {
         if (color != GetPixelColorFromCanvas(x, y)) return;
 
-        Paint(x, y, Wall_E.Instance.currentColor, Wall_E.Instance.brushSize);
-        Fill(x + 1, y, color);
-        Fill(x - 1, y, color);
-        Fill(x, y + 1, color);
-        Fill(x, y - 1, color);
+        await Paint(x, y, Wall_E.Instance.currentColor, Wall_E.Instance.brushSize);
+        await Fill(x + 1, y, color);
+       await Fill(x - 1, y, color);
+        await Fill(x, y + 1, color);
+        await Fill(x, y - 1, color);
     }
 
     public static int GetActualX() => Wall_E.Instance.x;

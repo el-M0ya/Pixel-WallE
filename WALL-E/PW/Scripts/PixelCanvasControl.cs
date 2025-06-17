@@ -25,6 +25,10 @@ namespace PW
 
         // Pincel para la cuadrícula
         private readonly Pen _gridPen = new(Brushes.LightGray, 0.5);
+        
+        // Fuente para las coordenadas
+        private readonly Typeface _coordinateTypeface = new("Arial");
+        private const double CoordinateFontSize = 10;
 
         public PixelCanvasControl()
         {
@@ -44,21 +48,24 @@ namespace PW
             CanvasDimension = dimension;
             _pixelData = new Color[dimension, dimension];
             Clear(); // Limpia al nuevo tamaño
-
         }
 
         /// <summary>
         /// Pinta un píxel en una coordenada específica.
         /// </summary>
-        public void SetPixel(int x, int y, Color color)
+        public async Task SetPixel(int x, int y, Color color)
         {
+
             if (x < 0 || x >= CanvasDimension || y < 0 || y >= CanvasDimension)
             {
                 MainWindow.SetStatus("Out of range", true);
-                
                 return;
             }
             _pixelData[x, y] = color;
+            InvalidateVisual(); // Forzar redibujado inmediato
+
+            
+            await Task.Delay(10);
         }
 
         /// <summary>
@@ -107,8 +114,6 @@ namespace PW
             base.Render(context);
             if (_pixelData == null) return;
 
-
-
             // Calcula el tamaño de cada "píxel" en la pantalla
             double cellWidth = this.Bounds.Width / CanvasDimension;
             double cellHeight = this.Bounds.Height / CanvasDimension;
@@ -142,21 +147,93 @@ namespace PW
                 var p2 = new Point(this.Bounds.Width, i * cellHeight);
                 context.DrawLine(_gridPen, p1, p2);
             }
-            int wallex = Wall_E.Instance.x;
-            int walley = Wall_E.Instance.y;
-            if (wallex < 0 || wallex > CanvasDimension || walley < 0 || walley > CanvasDimension) return;
 
-            var image = new Bitmap(!MainWindow.isWallEImage
-            ? "Assets/EVA.png"
-            : "Assets/WALL-E.png");
+            // Dibuja las coordenadas en los bordes
+            DrawCoordinates(context, cellWidth, cellHeight);
 
-            Rect destRect = new Rect(wallex * cellWidth, walley * cellHeight, cellWidth, cellHeight);
-            context.DrawImage(image, destRect);
+            // Dibuja Wall-E
+            DrawWallE(context, cellWidth, cellHeight);
         }
 
+        /// <summary>
+        /// Dibuja las coordenadas en los bordes del canvas
+        /// </summary>
+        private void DrawCoordinates(DrawingContext context, double cellWidth, double cellHeight)
+        {
+            var textBrush = new SolidColorBrush(Colors.Gray);
+            
+            // Dibujar coordenadas en el eje X (arriba)
+            for (int x = 0; x < CanvasDimension; x++)
+            {
+                var text = new FormattedText(
+                    x.ToString(),
+                    System.Globalization.CultureInfo.CurrentCulture,
+                    FlowDirection.LeftToRight,
+                    _coordinateTypeface,
+                    CoordinateFontSize,
+                    textBrush);
+                
+                context.DrawText(text, new Point(
+                    x * cellWidth + cellWidth / 2 - text.Width / 2, 
+                    2));
+            }
 
+            // Dibujar coordenadas en el eje Y (izquierda)
+            for (int y = 0; y < CanvasDimension; y++)
+            {
+                var text = new FormattedText(
+                    y.ToString(),
+                    System.Globalization.CultureInfo.CurrentCulture,
+                    FlowDirection.LeftToRight,
+                    _coordinateTypeface,
+                    CoordinateFontSize,
+                    textBrush);
+                
+                context.DrawText(text, new Point(
+                    2,
+                    y * cellHeight + cellHeight / 2 - text.Height / 2));
+            }
+        }
 
+        /// <summary>
+        /// Dibuja la imagen de Wall-E en su posición actual
+        /// </summary>
+        private void DrawWallE(DrawingContext context, double cellWidth, double cellHeight)
+        {
+            int wallex = Wall_E.Instance.x;
+            int walley = Wall_E.Instance.y;
+            
+            if (wallex < 0 || wallex >= CanvasDimension || walley < 0 || walley >= CanvasDimension) 
+                return;
+
+            try
+            {
+                var image = new Bitmap(!MainWindow.isWallEImage
+                    ? "Assets/EVA.png"
+                    : "Assets/WALL-E.png");
+
+                Rect destRect = new Rect(
+                    wallex * cellWidth, 
+                    walley * cellHeight, 
+                    cellWidth, 
+                    cellHeight);
+                
+                context.DrawImage(image, destRect);
+            }
+            catch
+            {
+                // Manejar errores de carga de imagen
+                var brush = new SolidColorBrush(Colors.Red);
+                var rect = new Rect(
+                    wallex * cellWidth, 
+                    walley * cellHeight, 
+                    cellWidth, 
+                    cellHeight);
+                context.DrawRectangle(brush, null, rect);
+            }
+        }
     }
+
     public class CustomHighlighting : IHighlightingDefinition
     {
         private readonly Dictionary<string, HighlightingColor> _namedColors;
@@ -185,13 +262,20 @@ namespace PW
             {
                 Foreground = new SimpleHighlightingBrush(Colors.Peru)
             };
+            
             _namedColors["Number"] = new HighlightingColor
             {
-                Foreground = new SimpleHighlightingBrush(Colors.DarkRed)
+                Foreground = new SimpleHighlightingBrush(Colors.Red)
             };
+            
             _namedColors["Operator"] = new HighlightingColor
             {
-                Foreground = new SimpleHighlightingBrush(Colors.RoyalBlue)
+                Foreground = new SimpleHighlightingBrush(Colors.DarkOrange)
+            };
+            
+            _namedColors["Symbol"] = new HighlightingColor
+            {
+                Foreground = new SimpleHighlightingBrush(Colors.MediumPurple)
             };
 
             // Define tus reglas
@@ -203,10 +287,9 @@ namespace PW
 
             var functionRule = new HighlightingRule
             {
-                Regex = new Regex(@"\b(GetActualX|GetActualY|GetCanvasSize|GetColorCount|IsBrushSize|IsBrushColor|IsBrushColor|GoTo)\b"),
+                Regex = new Regex(@"\b(GetActualX|GetActualY|GetCanvasSize|GetColorCount|IsBrushSize|IsBrushColor|IsCanvasColor|GoTo)\b"),
                 Color = _namedColors["Function"]
             };
-
 
             var stringRule = new HighlightingRule
             {
@@ -214,15 +297,25 @@ namespace PW
                 Color = _namedColors["String"]
             };
 
+            // Mejorada para detectar números enteros y decimales
             var numberRule = new HighlightingRule
             {
-                Regex = new Regex(@"\bd+\b"),
+                Regex = new Regex(@"\b\d+(\.\d+)?\b"),
                 Color = _namedColors["Number"]
             };
+            
+            // Regla para operadores matemáticos
             var operatorRule = new HighlightingRule
             {
-                Regex = new Regex(@"\b(-|/|=|<|>|!|<-|%)\b"),
+                Regex = new Regex(@"\+|\-|\*|/|%"),
                 Color = _namedColors["Operator"]
+            };
+            
+            // Regla para símbolos especiales
+            var symbolRule = new HighlightingRule
+            {
+                Regex = new Regex(@"<-|\(|\)|\[|\]|,"),
+                Color = _namedColors["Symbol"]
             };
 
             MainRuleSet.Rules.Add(instructionRule);
@@ -230,6 +323,7 @@ namespace PW
             MainRuleSet.Rules.Add(stringRule);
             MainRuleSet.Rules.Add(numberRule);
             MainRuleSet.Rules.Add(operatorRule);
+            MainRuleSet.Rules.Add(symbolRule);
         }
 
         // Implementación de la interfaz

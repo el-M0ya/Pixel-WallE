@@ -1,6 +1,5 @@
 namespace PW;
-
-using System;
+using System.Threading.Tasks;
 
 public abstract class Expr
 {
@@ -399,10 +398,10 @@ public abstract class Stmt
         void visitSpawnStmt(Spawn expr);
         void visitColorStmt(Color expr);
         void visitSizeStmt(Size expr);
-        void visitDrawLineStmt(DrawLine expr);
-        void visitDrawCircleStmt(DrawCircle expr);
-        void visitDrawRectangleStmt(DrawRectangle expr);
-        void visitFillStmt(Fill expr);
+        Task visitDrawLineStmt(DrawLine expr);
+        Task visitDrawCircleStmt(DrawCircle expr);
+        Task visitDrawRectangleStmt(DrawRectangle expr);
+        Task visitFillStmt(Fill expr);
         void visitVarStmt(Var expr);
         void visitLabelStmt(Label expr);
         void visitGoToStmt(GoTo expr);
