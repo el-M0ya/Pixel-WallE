@@ -21,14 +21,14 @@ namespace PW
         public Color[,] _pixelData;
 
         // Dimensiones del canvas en píxeles
-        public int CanvasDimension { get; private set; } = 32;
+        public int CanvasDimension { get; private set; } = (int)Values.CanvasDefault;
 
         // Pincel para la cuadrícula
         private readonly Pen _gridPen = new(Brushes.LightGray, 0.5);
         
         // Fuente para las coordenadas
         private readonly Typeface _coordinateTypeface = new("Arial");
-        private const double CoordinateFontSize = 10;
+        private const double CoordinateFontSize = (int)Values.CoordinateFontSize;
 
         public PixelCanvasControl()
         {
@@ -64,8 +64,8 @@ namespace PW
             _pixelData[x, y] = color;
             InvalidateVisual(); // Forzar redibujado inmediato
 
-            
-            await Task.Delay(10);
+            int time = Wall_E.Instance.isFilling ? (int)Values.FillTime : (int)Values.DelayTime;
+            await Task.Delay(time);
         }
 
         /// <summary>

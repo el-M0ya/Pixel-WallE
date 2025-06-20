@@ -22,6 +22,7 @@ using AvaloniaEdit.Highlighting.Xshd;
 public class Wall_E
 {
     public bool isSpawn = false;
+    public bool isFilling = false;
     public int x;
     public int y;
     public string currentColor;
@@ -31,7 +32,7 @@ public class Wall_E
     public Wall_E(int x, int y, string currentColor, int brushSize)
     {
         if (Instance == null) Instance = this;
-        else throw new Exception("Many Wall_E's in scene");
+        else throw new Exception("Many Wall_E's in Canvas");
         this.x = x;
         this.y = y;
         this.currentColor = currentColor;
@@ -55,7 +56,10 @@ public partial class MainWindow : Window
             { "Red", Colors.Red }, { "Green", Colors.Green },
             { "Blue", Colors.Blue }, { "Yellow", Colors.Yellow },
             { "Orange", Colors.Orange }, { "Purple", Colors.Purple },
-            { "Transparent", Colors.Transparent } // Transparente es especial, usualmente significa "no pintar"
+            { "Brown", Colors.Brown }, { "Peru", Colors.Peru },
+            { "Violet", Colors.Violet}, { "Cyan", Colors.Cyan },
+            { "Gray", Colors.Gray}, { "Pink", Colors.Pink },
+            { "Transparent", Colors.Transparent } // Transparente es especial, significa "no pintar"
         };
 
     // Referencias a los controles de la UI
@@ -144,7 +148,8 @@ public partial class MainWindow : Window
                     // Pintar el píxel individual
                     await _pixelCanvas.SetPixel(targetX, targetY, _colorNameMap[color]);
                     _pixelCanvas.Refresh(); // Forzar actualización después de cada píxel
-                    await Task.Delay(10); // Pequeño retraso para visualización
+                    int time = Wall_E.Instance.isFilling ? (int)Values.FillTime : (int)Values.DelayTime;
+                    await Task.Delay(time); // Pequeño retraso para visualización
                 
                 }
             }
@@ -396,6 +401,9 @@ public partial class MainWindow : Window
     {
         int wallex = Wall_E.Instance.x;
         int walley = Wall_E.Instance.y;
+
+        if (width == 1 && height == 1) await Paint(wallex, walley);
+
         int x1 = wallex - (width - 1);
         int x2 = wallex + (width - 1);
         int y1 = walley - (height - 1);
@@ -415,6 +423,7 @@ public partial class MainWindow : Window
     }
     public static async Task Fill()
     {
+        Wall_E.Instance.isFilling = true;
         int x = Wall_E.Instance.x;
         int y = Wall_E.Instance.y;
         if (GetPixelColorFromCanvas(x, y) == _colorNameMap[Wall_E.Instance.currentColor]) return;

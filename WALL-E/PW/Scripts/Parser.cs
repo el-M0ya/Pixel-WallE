@@ -16,7 +16,8 @@ public class Parser
     {
         this.tokens = tokens;
     }
-    // private  Dictionary<TokenType, Expr> functions = new Dictionary<TokenType, Expr>()
+
+    // private  Dictionary<TokenType, Func<Expr>> functions = new Dictionary<TokenType, Expr>()
     // {
     //     {TokenType.GETACTUALX , GetActualX()},
     //     {TokenType.GETACTUALY , GetActualY()},

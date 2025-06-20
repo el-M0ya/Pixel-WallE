@@ -327,12 +327,12 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
             try
             {
                 if (count > 1000) throw new RuntimeError(new Token(TokenType.GOTO, null, null, 0), "Stack overflow");
-
+                Wall_E.Instance.isFilling = false;
                 Stmt stmt = statements[line - 1];
                 if (stmt is Stmt.DrawLine ||
                      stmt is Stmt.DrawCircle ||
                      stmt is Stmt.DrawRectangle ||
-                     stmt is Stmt.Fill)await executeAsync(stmt);
+                     stmt is Stmt.Fill) await executeAsync(stmt);
                 else
                     execute(stmt);
                 count++;
@@ -347,7 +347,7 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
                 if (error is RuntimeError runtimeError)
                     PixelWallE.runtimeError(runtimeError);
             });
-            break;
+                break;
             }
         }
     }
