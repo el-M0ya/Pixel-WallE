@@ -15,49 +15,44 @@ public class Parser
     public Parser(List<Token> tokens)
     {
         this.tokens = tokens;
+        InitializeHandlers();
     }
 
-    // private  Dictionary<TokenType, Func<Expr>> functions = new Dictionary<TokenType, Expr>()
-    // {
-    //     {TokenType.GETACTUALX , GetActualX()},
-    //     {TokenType.GETACTUALY , GetActualY()},
-    //     {TokenType.GETCANVASIZE ,  GetCanvasSize()},
-    //     {TokenType.GETCOLORCOUNT , GetColorCount()},
-    //     {TokenType.ISBRUSHSIZE , IsBrushSize()},
-    //     {TokenType.ISBRUSHCOLOR , IsBrushColor()},
-    //     {TokenType.ISCANVASCOLOR , IsCanvasColor()}
-    // };
-    // private  Dictionary<TokenType, Stmt> instructions = new Dictionary<TokenType, Stmt>()
-    // {
-    //     {TokenType.SPAWN , SpawnStatement()},
-    //     {TokenType.COLOR , ColorStatement()},
-    //     {TokenType.SIZE ,  SizeStatement()},
-    //     {TokenType.DRAWLINE , DrawLineStatement()},
-    //     {TokenType.DRAWCIRCLE, DrawCircleStatement()},
-    //     {TokenType.DRAWRECTANGLE , DrawRectangleStatement()},
-    //     {TokenType.FILL , FillStatement()}
-    // };
+    private void InitializeHandlers()
+    {
+        instructions = new Dictionary<TokenType, Func<Stmt>>
+        {
+            { TokenType.GOTO, () => GoToStatement() },
+            { TokenType.SPAWN, () => SpawnStatement() },
+            { TokenType.COLOR, () => ColorStatement() },
+            { TokenType.DRAWLINE, () => DrawLineStatement() },
+            { TokenType.DRAWCIRCLE, () => DrawCircleStatement() },
+            { TokenType.DRAWRECTANGLE, () => DrawRectangleStatement() },
+            { TokenType.SIZE, () => SizeStatement() },
+            { TokenType.FILL, () => FillStatement() }
+        };
+
+        functions = new Dictionary<TokenType, Func<Expr>>
+        {
+            { TokenType.GETACTUALX, () => GetActualX() },
+            { TokenType.GETACTUALY, () => GetActualY() },
+            { TokenType.GETCANVASIZE, () => GetCanvasSize() },
+            { TokenType.GETCOLORCOUNT, () => GetColorCount() },
+            { TokenType.ISBRUSHSIZE, () => IsBrushSize() },
+            { TokenType.ISBRUSHCOLOR, () => IsBrushColor() },
+            { TokenType.ISCANVASCOLOR, () => IsCanvasColor() }
+        };
+    }
+
+
+    private Dictionary<TokenType, Func<Expr>> functions;
+    private Dictionary<TokenType, Func<Stmt>> instructions;
     private Stmt statement()
     {
-        if (match([TokenType.GOTO])) { return GoToStatement(); }
-        if (match([TokenType.SPAWN])) { current--; return SpawnStatement(); }
-        if (match([TokenType.COLOR])) { current--; return ColorStatement(); }
-        if (match([TokenType.DRAWLINE])) { current--; return DrawLineStatement(); }
-        if (match([TokenType.DRAWCIRCLE])) { current--; return DrawCircleStatement(); }
-        if (match([TokenType.DRAWRECTANGLE])) { current--; return DrawRectangleStatement(); }
-        if (match([TokenType.SIZE])) { current--; return SizeStatement(); }
-        if (match([TokenType.FILL])) { current--; return FillStatement(); }
-        else
-            return expressionStatement();
-
+        TokenType type = peek().type;
+        if (!instructions.TryGetValue(type , out var handler)) return expressionStatement();
+        return handler();
     }
-    // private Stmt statement()
-    // {
-
-    //     TokenType type = peek().type;
-    //     if (!instructions.ContainsKey(type)) return expressionStatement();
-    //     return instructions[type];
-    // }
     private Stmt expressionStatement()
     {
         Expr expr = expression();
@@ -121,6 +116,7 @@ public class Parser
 
     private Stmt GoToStatement()
     {
+        Token name = consume(TokenType.GOTO, "No GoTo statement found");
         consume(TokenType.LEFT_SQUARE, "Expect '[' after 'GoTo'.");
         Token label = consume(TokenType.IDENTIFIER, "Expect label name.");
         consume(TokenType.RIGHT_SQUARE, "Expect ']' after label.");
@@ -438,14 +434,10 @@ public class Parser
 
     {
 
-        if (match([TokenType.GETACTUALX])) { current -= 1; return GetActualX(); }
-        if (match([TokenType.GETACTUALY])) {current -= 1 ; return GetActualY();}
-        if (match([TokenType.GETCANVASIZE])) {current -= 1 ; return GetCanvasSize();}
-        if (match([TokenType.GETCOLORCOUNT])){current -= 1 ;  return GetColorCount();}
-        if (match([TokenType.ISBRUSHSIZE])) {current -= 1 ; return IsBrushSize();}
-        if (match([TokenType.ISBRUSHCOLOR])) {current -= 1 ; return IsBrushColor();}
-        if (match([TokenType.ISCANVASCOLOR])) {current -= 1 ; return IsCanvasColor();}
-        if (match([TokenType.NULL]))  return new Expr.Literal(null);
+        TokenType type = peek().type;
+        if (functions.TryGetValue(type , out var handler)) return handler();
+        
+        if (match([TokenType.NULL])) return new Expr.Literal(null);
         if (match([TokenType.NUMBER, TokenType.STRING])) return new Expr.Literal(previous().literal);
         if (match([TokenType.IDENTIFIER])) return new Expr.Var(previous());
         if (match([TokenType.LEFT_PAREN]))
