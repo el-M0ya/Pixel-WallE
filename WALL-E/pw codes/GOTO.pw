@@ -1,0 +1,8 @@
+Spawn(5, 5)
+ Color("Black")
+n <- 1
+label
+DrawLine(1 , 0  , n)
+n <- n+1
+GoTo[label](n < 5)
+ 

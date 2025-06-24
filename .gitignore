@@ -1,0 +1,65 @@
+# Archivos de compilación y binarios
+bin/
+obj/
+[Bb]uild/
+[Dd]ebug/
+[Rr]elease/
+*.exe
+*.dll
+*.pdb
+*.cache
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Archivos de VS
+.vs/
+*.swp
+*.swo
+*~
+*.swp
+*.swo
+
+# Archivos de Rider
+.idea/
+*.sln.iml
+
+# Archivos de NuGet
+packages/
+[Nn]u[Gg]et.exe
+*.nupkg
+*.nuspec
+
+# Archivos de usuario
+*.userprefs
+
+# Archivos de MSTest
+*.TestResult.xml
+
+# Archivos de ReSharper
+_ReSharper.*
+*.ReSharper.*
+
+# Archivos de dotCover
+*.dotCover
+
+# Archivos de Azure
+*.pubxml
+
+# Archivos de Mac
+.DS_Store
+
+# Archivos de Linux
+*~
+
+# Archivos de Rider
+*.idea/
+*.sln.iml
+
+# Archivos de VSCode
+.vscode/
+
+# Archivos de Avalonia específicos
+avalonia.compiler/
+avalonia/

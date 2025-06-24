@@ -1,0 +1,5 @@
+Spawn(5 , 15)
+DrawLine(1 , 0 , 10)
+DrawLine(1 , 1 , 10)
+DrawLine(0 , -1 , 10)
+DrawLine(-1 , -1 , 10)

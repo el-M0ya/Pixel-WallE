@@ -1,0 +1,4 @@
+Spawn (3 , 15)
+x <- GetActualX()
+Color("Purple")
+DrawLine(1 , 0 , x)
