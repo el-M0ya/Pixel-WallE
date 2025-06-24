@@ -33,13 +33,16 @@
 
             <Border Grid.Row="2" BorderBrush="Gray" BorderThickness="1" Margin="5" Background="Azure">
                 <AvaloniaEdit:TextEditor Name="_CodeEditorTextBox" FontFamily="Consolas, Menlo, Cascadia Mono, Fira Code, monospace" FontSize="14" ShowLineNumbers="True" WordWrap="False"
-                                           HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Watermark="Write code for Wall-E here ..." />
+                                       HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Watermark="Write code for Wall-E here ..." />
             </Border>
 
             <StackPanel Grid.Row="3" Margin="5" Spacing="5">
                 <TextBlock Text="Status:" FontWeight="Bold"/>
                 <TextBlock TextWrapping="Wrap" MinHeight="40" Text="" Name="_StatusOutputTextBlock" Background="Black" Foreground="LightGreen" Padding="5" FontSize="12"/>
-                <Button Content="Run" Name="_ExecuteButton" HorizontalAlignment="Stretch" Height="40" FontWeight="Bold" Background="LightGreen"/>
+                <StackPanel Orientation="Horizontal" Spacing="5">
+                    <Button Content="Run" Name="_ExecuteButton" HorizontalAlignment="Center" Height="40" Width="168" FontWeight="Bold" Background="LightGreen"/>
+                    <Button Content="Stop" Name="_StopButton" HorizontalAlignment="Center" Height="40"   Width="168" FontWeight="Bold" Background="LightCoral" IsEnabled="False"/>
+                </StackPanel>
             </StackPanel>
         </Grid>
     </Grid>

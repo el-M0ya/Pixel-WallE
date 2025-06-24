@@ -3,6 +3,7 @@ namespace PW;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Threading;
 
 public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
 {
@@ -109,15 +110,15 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
 
     public object visitGetActualX(Expr.GetActualX expr)
     {
-        return MainWindow.GetActualX();
+        return Func.GetActualX();
     }
     public object visitGetActualY(Expr.GetActualY expr)
     {
-        return MainWindow.GetActualY();
+        return Func.GetActualY();
     }
     public object visitGetCanvasSize(Expr.GetCanvasSize expr)
     {
-        return MainWindow.GetCanvasSize();
+        return Func.GetCanvasSize();
     }
     public object visitGetColorCount(Expr.GetColorCount expr)
     {
@@ -126,19 +127,19 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
         checkNumber(expr.name ,expr.y1, "GetColorCount.y1");
         checkNumber(expr.name ,expr.x2, "GetColorCount.x2");
         checkNumber(expr.name ,expr.y2, "GetColorCount.y2");
-        return MainWindow.GetColorCount(stringify(evaluate(expr.color)),
+        return Func.GetColorCount(stringify(evaluate(expr.color)),
                                         (int)evaluate(expr.x1), (int)evaluate(expr.y1),
                                         (int)evaluate(expr.x2), (int)evaluate(expr.y2));
     }
     public object visitIsBrushSize(Expr.IsBrushSize expr)
     {
         checkNumber(expr.name ,expr.size, "IsBrushSize.size");
-        return MainWindow.IsBrushSize((int)evaluate(expr.size));
+        return Func.IsBrushSize((int)evaluate(expr.size));
     }
     public object visitIsBrushColor(Expr.IsBrushColor expr)
     {
         checkString(expr.name ,expr.color, "IsBrushColor.color");
-        return MainWindow.IsBrushColor(stringify(evaluate(expr.color)));
+        return Func.IsBrushColor(stringify(evaluate(expr.color)));
     }
     public object visitIsCanvasColor(Expr.IsCanvasColor expr)
     {
@@ -147,7 +148,7 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
         checkNumber(expr.name ,expr.x, "IsCanvasColor.x");
         checkNumber(expr.name ,expr.y, "IsCanvasColor.y");
 
-        return MainWindow.IsCanvasColor(stringify(evaluate(expr.color)),
+        return Func.IsCanvasColor(stringify(evaluate(expr.color)),
                                         (int)evaluate(expr.x), (int)evaluate(expr.y));
     }
 
@@ -168,13 +169,13 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
         int x = (int)evaluate(spawn.x);
         int y = (int)evaluate(spawn.y);
         Wall_E.Instance.isSpawn = true;
-        MainWindow.Spawn(x, y);
+        Func.Spawn(x, y);
     }
     public void visitColorStmt(Stmt.Color color)
     {
         checkString(color.name , color.color , "Color.color");
         string newcolor = stringify(evaluate(color.color));
-        if (MainWindow._colorNameMap.ContainsKey(newcolor)) MainWindow.Color(newcolor);
+        if (MainWindow._colorNameMap.ContainsKey(newcolor)) Func.Color(newcolor);
         else
             throw new RuntimeError(color.name, $"Invalid color: {newcolor}");
 
@@ -183,7 +184,7 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
     {
         checkNumber(size.name , size.size, "Size.size");
         int newsize = (int)evaluate(size.size);
-        MainWindow.Size(newsize);
+        Func.Size(newsize);
     }
     public async Task visitDrawLineStmt(Stmt.DrawLine drawLine)
     {
@@ -200,7 +201,7 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
             y = -y;
             distance = -distance;
         }
-        await MainWindow.DrawLine(x , y , distance);
+        await Func.DrawLine(x , y , distance);
     }
     public async Task visitDrawCircleStmt(Stmt.DrawCircle drawCircle)
     {
@@ -212,7 +213,7 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
          if (x < -1 || x > 1 || y < -1 || y > 1) throw new RuntimeError(drawCircle.name , "Parameters out of range: directions are between -1 and 1");
         int radius = (int)evaluate(drawCircle.radius);
         if (radius < 0) radius = -radius;
-       await MainWindow.DrawCircle(x , y , radius);
+       await Func.DrawCircle(x , y , radius);
     }
     public async Task visitDrawRectangleStmt(Stmt.DrawRectangle drawRectangle)
     {
@@ -237,11 +238,11 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
         int height = (int)evaluate(drawRectangle.height);
         if (height < 0) height = -height;
         
-         await MainWindow.DrawRectangle(x , y , distance , width , height);
+         await Func.DrawRectangle(x , y , distance , width , height);
     }
     public async Task visitFillStmt(Stmt.Fill fill)
     {
-        await MainWindow.Fill();
+        await Func.Fill();
     }
     public void visitGoToStmt(Stmt.GoTo stmt)
     {
@@ -306,7 +307,7 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
         return expr.Accept(this);
     }
 
-    public async Task interpret(List<Stmt> statements)
+    public async Task interpret(List<Stmt> statements , CancellationToken cancellationToken = default)
     {
         environment.Reset(); 
         line = 1;
@@ -326,6 +327,7 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
         {
             try
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 if (count > 1000) throw new RuntimeError(new Token(TokenType.GOTO, null, null, 0), "Stack overflow");
                 Wall_E.Instance.isFilling = false;
                 Stmt stmt = statements[line - 1];

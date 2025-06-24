@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using System.Threading;
 
 public class PixelWallE
 {
@@ -12,7 +13,7 @@ public class PixelWallE
     public static bool HadRuntimeError { get; private set; } = false;
 
     public PixelWallE() { }
-    public async Task  Run(string source)
+    public async Task Run(string source , CancellationToken cancellationToken = default)
     {
         HadError = false;
         Scanner scanner = new Scanner(source);
@@ -23,7 +24,7 @@ public class PixelWallE
         // Stop if there was a syntax error.
         if (HadError) return;
 
-        await interpreter.interpret(statements);
+        await interpreter.interpret(statements , cancellationToken);
         
     }
     public static void Error(int line, string message)
