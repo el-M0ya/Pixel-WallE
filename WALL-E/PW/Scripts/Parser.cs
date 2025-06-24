@@ -2,7 +2,6 @@ namespace PW;
 
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 
 public class Parser
 {
@@ -11,6 +10,8 @@ public class Parser
     private List<Token> tokens;
 
     private int current = 0;
+    private Dictionary<TokenType, Func<Expr>>? functions;
+    private Dictionary<TokenType, Func<Stmt>>? instructions;
 
     public Parser(List<Token> tokens)
     {
@@ -45,8 +46,7 @@ public class Parser
     }
 
 
-    private Dictionary<TokenType, Func<Expr>> functions;
-    private Dictionary<TokenType, Func<Stmt>> instructions;
+
     private Stmt statement()
     {
         TokenType type = peek().type;
@@ -102,13 +102,13 @@ public class Parser
         {
             initializer = expression();
         }
-        consume(TokenType.JUMPLINE, "Expect 'line' after variable declaration.");
+        if (!isAtEnd()) consume(TokenType.JUMPLINE, "Expexted line");    
         return new Stmt.Var(name, initializer);
     }
     private Stmt labelDeclaration()
     {
         Token label = consume(TokenType.IDENTIFIER, "Expect variable name.");
-        consume(TokenType.JUMPLINE, "Expect 'line' after label declaration.");
+         if (!isAtEnd()) consume(TokenType.JUMPLINE, "Expexted line");
         return new Stmt.Label(label);
 
         
@@ -125,7 +125,7 @@ public class Parser
         Expr condition = expression();
         consume(TokenType.RIGHT_PAREN, "Expect ')' after condition.");
 
-        consume(TokenType.JUMPLINE, "Expect 'line' after GoTo statement.");
+         if (!isAtEnd()) consume(TokenType.JUMPLINE, "Expexted line");
 
         return new Stmt.GoTo(label, condition);
     }
@@ -143,7 +143,7 @@ public class Parser
         consume(TokenType.RIGHT_PAREN, "Expect ')' after 'y'.");
 
 
-        if (!match([TokenType.JUMPLINE, TokenType.EOF])) error(peek(), "Expexted line");
+         if (!isAtEnd()) consume(TokenType.JUMPLINE, "Expexted line");
 
         return new Stmt.Spawn(name, x, y);
     }
@@ -157,7 +157,7 @@ public class Parser
         consume(TokenType.RIGHT_PAREN, "Expect ')' after 'color'.");
 
 
-        if (!match([TokenType.JUMPLINE, TokenType.EOF])) error(peek(), "Expexted line");
+         if (!isAtEnd()) consume(TokenType.JUMPLINE, "Expexted line");
 
         return new Stmt.Color(name, color);
     }
@@ -173,7 +173,7 @@ public class Parser
         consume(TokenType.RIGHT_PAREN, "Expect ')' after 'number'.");
 
 
-        if (!match([TokenType.JUMPLINE, TokenType.EOF])) error(peek(), "Expexted line");
+         if (!isAtEnd()) consume(TokenType.JUMPLINE, "Expexted line");
 
         return new Stmt.Size(name, k);
     }
@@ -191,7 +191,7 @@ public class Parser
         consume(TokenType.RIGHT_PAREN, "Expect ')' after 'distance'.");
 
 
-        if (!match([TokenType.JUMPLINE, TokenType.EOF])) error(peek(), "Expexted line");
+         if (!isAtEnd()) consume(TokenType.JUMPLINE, "Expexted line");
 
         return new Stmt.DrawLine(name, dirX, dirY, distance);
     }
@@ -210,7 +210,7 @@ public class Parser
         consume(TokenType.RIGHT_PAREN, "Expect ')' after 'radius'.");
 
 
-        if (!match([TokenType.JUMPLINE, TokenType.EOF])) error(peek(), "Expexted line");
+        endstmt();
 
         return new Stmt.DrawCircle(name, dirX, dirY, radius);
     }
@@ -232,7 +232,7 @@ public class Parser
         consume(TokenType.RIGHT_PAREN, "Expect ')' after 'high'.");
 
 
-        if (!match([TokenType.JUMPLINE, TokenType.EOF])) error(peek(), "Expexted line");
+        if (!isAtEnd()) consume(TokenType.JUMPLINE, "Expexted line");
 
         return new Stmt.DrawRectangle(name, dirX, dirY, distance, width, high);
     }
@@ -242,7 +242,7 @@ public class Parser
         consume(TokenType.LEFT_PAREN, "Expect '(' after 'Fill' Instruction'.");
         consume(TokenType.RIGHT_PAREN, "Expect ')' after '('.");
 
-        if (!match([TokenType.JUMPLINE, TokenType.EOF])) error(peek(), "Expexted line");
+        if (!isAtEnd()) consume(TokenType.JUMPLINE, "Expexted line");
 
         return new Stmt.Fill(name);
     }
@@ -489,7 +489,10 @@ public class Parser
         if (check(type)) return advance();
         throw error(peek(), message);
     }
-
+    private void endstmt()
+    {
+        if (!isAtEnd()) consume(TokenType.JUMPLINE, "Expexted line");
+    }
 
 
     // Error Handling-
@@ -500,6 +503,8 @@ public class Parser
         PixelWallE.Error(token, message);
         return new ParseError();
     }
+
+   
 
     private void synchronize()
     {

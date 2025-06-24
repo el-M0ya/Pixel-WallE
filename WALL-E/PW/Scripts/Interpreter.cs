@@ -161,7 +161,7 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
     {
         if (Wall_E.Instance.isSpawn)
         {
-            throw new RuntimeError(spawn.name , "Mas de un Spawn");
+            throw new RuntimeError(spawn.name , "Many Spawn's");
         }
         checkNumber(spawn.name ,spawn.x, "Spawn.x");
         checkNumber(spawn.name ,spawn.y, "Spawn.y");
@@ -310,7 +310,7 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
     {
         environment.Reset(); 
         line = 1;
-        // PRIMERA PASADA: Registrar todas las etiquetas
+        //Fist Round: Check all labels
         for (int i = 0; i < statements.Count; i++)
         {
             if (statements[i] is Stmt.Label labelStmt)
@@ -319,7 +319,7 @@ public class Interpreter : Expr.IVisitor<object> , Stmt.IVisitor
             }
         }
 
-        // SEGUNDA PASADA: Ejecución
+        //Second Round: Execution
         int count = 0;
         line = 1;
         while (line <= statements.Count)

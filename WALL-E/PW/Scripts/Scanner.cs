@@ -27,7 +27,6 @@ public class Scanner
         {"IsCanvasColor", TokenType.ISCANVASCOLOR},
         {"IsBrushColor", TokenType.ISBRUSHCOLOR},
         {"IsBrushSize", TokenType.ISBRUSHSIZE},
-
     };
 
     public Scanner(string source)
@@ -42,9 +41,9 @@ public class Scanner
             start = current;
             ScanToken();
         }
+        if (tokens[tokens.Count - 1].type == TokenType.JUMPLINE) tokens.RemoveAt(tokens.Count - 1);
         tokens.Add(new Token(TokenType.EOF, "", null, line));
         return tokens;
-        
     }
     private bool isAtEnd()
     {
@@ -87,7 +86,7 @@ public class Scanner
                 addToken(Match('=') ? TokenType.GREATER_EQUAL : TokenType.GREATER); break;
 
             case '<':
-                if (Match('=')) addToken(TokenType.LESS_EQUAL);
+                if (Match('=')) { addToken(TokenType.LESS_EQUAL); break; }
                 if (Match('-')) addToken(TokenType.ASIGNATION);
                 else addToken(TokenType.LESS);
                 break;
@@ -201,15 +200,15 @@ public class Scanner
     /*  expression → literal
                     | unary
                     | binary
-                    | grouping ;
-          literal  → NUMBER | STRING | "true" | "false" | "nil" ;
-          grouping → "(" expression ")" ;
-          unary    → ( "-" | "!" ) expression ;
-          binary   → expression operator expression ;
+                    | grouping 
+          literal  → NUMBER | STRING 
+          grouping → "(" expression ")" 
+          unary    → ( "-" | "!" ) expression 
+          binary   → expression operator expression 
           operator → "==" | "!=" | "<" | "<=" | ">" | ">="
-                          | "+" | "-" | "*" | "/" ;
+                    | "+" | "-" | "*" | "/" | "**" | "%"
    */
-    public string SubString(string str , int start , int end)
+    private string SubString(string str , int start , int end)
     {
         if(start > end) throw new Exception($"SubStringError: Start > end in line:{line}");
         string result = "";
